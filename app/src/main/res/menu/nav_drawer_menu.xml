@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item android:id="@+id/openings"
+        android:title="Дебюты"/>
+    <item android:id="@+id/plays"
+        android:title="Партии"/>
+    <item android:id="@+id/engine"
+        android:title="Настройки движка"/>
+
+        <item
+            android:id="@+id/item3"
+            android:title="Партия"
+            app:showAsAction="never">
+
+            <menu>
+                    <item android:id="@+id/analysis"
+                        android:title="Анализ игры">
+
+                    </item>
+                    <item android:id="@+id/upload"
+                        android:title="Выгрузка текущей игры">
+
+                    </item>
+                    <item android:id="@+id/download"
+                        android:title="Загрузка игры">
+                    </item>
+                <item android:id="@+id/photoMaker"
+                    android:title="Загрузка игры по фотографии">
+                </item>
+
+            </menu>
+
+        </item>
+    </menu>

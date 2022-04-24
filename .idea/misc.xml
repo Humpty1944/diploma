@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DesignSurface">
+    <option name="filePathToZoomLevelMap">
+      <map>
+        <entry key="..\:/Android/app/src/main/res/layout/activity_main.xml" value="0.33" />
+        <entry key="..\:/Android/app/src/main/res/layout/chess_analysis.xml" value="0.1" />
+        <entry key="..\:/Android/app/src/main/res/layout/chess_opening.xml" value="0.36666666666666664" />
+        <entry key="..\:/Android/app/src/main/res/layout/engine_settings.xml" value="0.20364583333333333" />
+        <entry key="..\:/Android/app/src/main/res/layout/game_list.xml" value="0.33" />
+        <entry key="..\:/Android/app/src/main/res/layout/nav_header.xml" value="0.1" />
+        <entry key="..\:/Android/app/src/main/res/layout/opening_list.xml" value="0.67" />
+        <entry key="..\:/Android/app/src/main/res/layout/openings_table.xml" value="0.1" />
+        <entry key="..\:/Android/app/src/main/res/layout/plays_table.xml" value="0.1" />
+        <entry key="..\:/Android/app/src/main/res/layout/settings.xml" value="0.1" />
+        <entry key="..\:/Android/app/src/main/res/layout/table_row_plays.xml" value="0.5214285714285715" />
+        <entry key="..\:/Android/app/src/main/res/layout/turn_list.xml" value="0.1" />
+        <entry key="..\:/Android/app/src/main/res/menu/nav_drawer_menu.xml" value="0.1" />
+        <entry key="..\:/Android/app/src/main/res/menu/opening_search.xml" value="0.1" />
+        <entry key="..\:/Android/app/src/main/res/xml/engine_settings.xml" value="0.1" />
+      </map>
+    </option>
+  </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" project-jdk-name="1.8" project-jdk-type="JavaSDK">
+    <output url="file://$PROJECT_DIR$/build/classes" />
+  </component>
+  <component name="ProjectType">
+    <option name="id" value="Android" />
+  </component>
+</project>

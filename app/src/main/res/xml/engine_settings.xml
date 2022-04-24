@@ -1,0 +1,18 @@
+<PreferenceScreen
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+  <ListPreference
+      app:key="engineList"
+      app:title="Текущий движок"
+      app:useSimpleSummaryProvider="true"/>
+    <EditTextPreference
+        app:key="depth"
+        app:title="Глубина поиска"
+        app:useSimpleSummaryProvider="true"/>
+
+    <Preference
+        app:key="newEngine"
+        app:summary="Необходимо выбрать файл, предназначенный для данной системы"
+        app:title="Добавить новый движок"/>
+
+</PreferenceScreen>

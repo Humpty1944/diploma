@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<androidx.constraintlayout.widget.ConstraintLayout android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:id="@+id/layoutId"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+  <LinearLayout
+      android:id="@+id/rlMain"
+      android:layout_width="match_parent"
+      android:layout_height="40dp"
+      android:layout_margin="16dp"
+      android:layout_marginTop="63dp"
+      android:orientation="vertical"
+
+      app:layout_constraintBottom_toTopOf="@+id/chessBoard"
+      app:layout_constraintTop_toBottomOf="@+id/text_view_game_name"
+      tools:layout_editor_absoluteX="16dp">
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:ignore="MissingClass" />
+
+  </LinearLayout>
+
+  <views.ChessBoardView
+      android:id="@+id/chessBoard"
+      android:layout_width="362dp"
+      android:layout_height="360dp"
+      android:layout_marginStart="20dp"
+      android:layout_marginLeft="20dp"
+      android:layout_marginTop="116dp"
+      android:layout_marginEnd="20dp"
+      android:layout_marginRight="20dp"
+      android:visibility="visible"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintHorizontal_bias="1.0"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@+id/text_view_game_name"
+      tools:context=".MainActivity"
+      tools:ignore="MissingConstraints"
+      tools:visibility="visible" />
+
+  <TextView
+      android:id="@+id/text_view_game_name"
+      android:layout_width="321dp"
+      android:layout_height="45dp"
+      android:layout_marginStart="45dp"
+      android:layout_marginLeft="45dp"
+      android:layout_marginTop="28dp"
+      android:layout_marginEnd="45dp"
+      android:layout_marginRight="45dp"
+      android:gravity="center"
+      android:textSize="14sp"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintHorizontal_bias="0.0"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toTopOf="parent" />
+
+  <TextView
+      android:id="@+id/text_view_chess_anlysis"
+      android:layout_width="363dp"
+      android:layout_height="52dp"
+      android:layout_marginStart="16dp"
+      android:layout_marginLeft="16dp"
+      android:layout_marginTop="20dp"
+      android:layout_marginEnd="16dp"
+      android:layout_marginRight="16dp"
+
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@+id/text_view_opening_info" />
+
+  <TextView
+      android:id="@+id/text_view_opening_info"
+      android:layout_width="321dp"
+      android:layout_height="29dp"
+      android:layout_marginStart="30dp"
+      android:layout_marginLeft="30dp"
+      android:layout_marginTop="20dp"
+      android:layout_marginEnd="30dp"
+      android:layout_marginRight="30dp"
+      android:gravity="center"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@+id/chessBoard" />
+
+  <LinearLayout
+      android:id="@+id/buttonsLayout"
+      android:layout_width="365dp"
+      android:layout_height="48dp"
+      android:layout_marginStart="20dp"
+      android:layout_marginLeft="20dp"
+      android:layout_marginEnd="20dp"
+      android:layout_marginRight="20dp"
+      android:layout_marginBottom="7dp"
+      android:orientation="horizontal"
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintStart_toStartOf="parent">
+
+    <ImageButton
+        android:id="@+id/imageButtonBack"
+        android:layout_width="100dp"
+        android:layout_height="48dp"
+        android:layout_weight="1"
+        android:rotation="180"
+
+        app:srcCompat="@drawable/ic_action_step"
+        tools:ignore="SpeakableTextPresentCheck" />
+
+    <ImageButton
+        android:id="@+id/imageButtonNext"
+        android:layout_width="100dp"
+        android:layout_height="48dp"
+        android:layout_weight="1"
+        app:srcCompat="@drawable/ic_action_step"
+        tools:ignore="SpeakableTextPresentCheck" />
+  </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
