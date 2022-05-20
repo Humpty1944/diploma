@@ -120,6 +120,18 @@ public abstract ArrayList<PointF> helpCoord(float xCord, float yCoard, float cel
         }
         int gap = Math.abs(from.getCol() - to.getCol()) - 1;
         if (gap == 0) {
+            if(to.getCol()> from.getCol()){
+                if(getChessModel().pieceAt(new Square(to.getCol(), to.getRow()))!=null&&
+                        getChessModel().pieceAt(new Square(to.getCol(), to.getRow())).getPlayer()==getPlayer()){
+                    return false;
+                }
+            }
+            if(to.getCol()< from.getCol()){
+                if(getChessModel().pieceAt(new Square(to.getCol(), to.getRow()))!=null&&
+                        getChessModel().pieceAt(new Square(to.getCol(), to.getRow())).getPlayer()==getPlayer()){
+                    return false;
+                }
+            }
             return true;
         }
         for (int i = 1; i <= gap; i++) {
@@ -136,6 +148,18 @@ public abstract ArrayList<PointF> helpCoord(float xCord, float yCoard, float cel
         }
         int gap = Math.abs(from.getRow() - to.getRow()) - 1;
         if (gap == 0) {
+            if(to.getRow()> from.getRow()){
+                if(getChessModel().pieceAt(new Square(to.getCol(), to.getRow()))!=null&&
+                        getChessModel().pieceAt(new Square(to.getCol(), to.getRow())).getPlayer()==getPlayer()){
+                    return false;
+                }
+            }
+            if(to.getRow()< from.getRow()){
+                if(getChessModel().pieceAt(new Square(to.getCol(), to.getRow()))!=null&&
+                        getChessModel().pieceAt(new Square(to.getCol(), to.getRow())).getPlayer()==getPlayer()){
+                    return false;
+                }
+            }
             return true;
         }
 
@@ -200,5 +224,12 @@ public abstract ArrayList<PointF> helpCoord(float xCord, float yCoard, float cel
             return "R";
         }
         return "";
+    }
+    public  String turnToNotation(){
+
+        String result = "";
+        String fromCh = Character.toString((char) ((char) (getCol() + '0') + 49));
+        result+=fromCh+(getRow()+1);
+        return result;
     }
 }

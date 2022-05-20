@@ -7,21 +7,27 @@
     android:orientation="vertical"
     android:id="@+id/layoutId"
     xmlns:android="http://schemas.android.com/apk/res/android">
-
+<views.PromotionView
+    android:id="@+id/promotion_view"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:visibility="invisible"/>
   <LinearLayout
       android:id="@+id/rlMain"
       android:layout_width="match_parent"
       android:layout_height="40dp"
       android:layout_margin="16dp"
-      android:layout_marginTop="63dp"
+      android:layout_marginTop="50dp"
       android:orientation="vertical"
 
-      app:layout_constraintBottom_toTopOf="@+id/chessBoard"
+
       app:layout_constraintTop_toBottomOf="@+id/text_view_game_name"
       tools:layout_editor_absoluteX="16dp">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
+        android:clipToPadding="true"
+        android:nestedScrollingEnabled="false"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:ignore="MissingClass" />
@@ -31,10 +37,10 @@
   <views.ChessBoardView
       android:id="@+id/chessBoard"
       android:layout_width="362dp"
-      android:layout_height="360dp"
+      android:layout_height="350dp"
       android:layout_marginStart="20dp"
       android:layout_marginLeft="20dp"
-      android:layout_marginTop="116dp"
+      android:layout_marginTop="84dp"
       android:layout_marginEnd="20dp"
       android:layout_marginRight="20dp"
       android:visibility="visible"
@@ -48,57 +54,132 @@
 
   <TextView
       android:id="@+id/text_view_game_name"
-      android:layout_width="321dp"
-      android:layout_height="45dp"
-      android:layout_marginStart="45dp"
-      android:layout_marginLeft="45dp"
-      android:layout_marginTop="28dp"
-      android:layout_marginEnd="45dp"
-      android:layout_marginRight="45dp"
+      android:layout_width="408dp"
+      android:layout_height="42dp"
+      android:layout_marginTop="10dp"
       android:gravity="center"
       android:textSize="14sp"
       app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintHorizontal_bias="0.0"
       app:layout_constraintStart_toStartOf="parent"
       app:layout_constraintTop_toTopOf="parent" />
 
-  <TextView
-      android:id="@+id/text_view_chess_anlysis"
-      android:layout_width="363dp"
-      android:layout_height="52dp"
-      android:layout_marginStart="16dp"
-      android:layout_marginLeft="16dp"
-      android:layout_marginTop="20dp"
-      android:layout_marginEnd="16dp"
-      android:layout_marginRight="16dp"
+  <!--  <TextView-->
+<!--      android:id="@+id/text_view_chess_anlysis"-->
+<!--      android:layout_width="383dp"-->
+<!--      android:layout_height="24dp"-->
 
+<!--      android:layout_marginStart="8dp"-->
+<!--      android:layout_marginLeft="8dp"-->
+<!--      android:layout_marginTop="5dp"-->
+<!--      android:layout_marginEnd="8dp"-->
+<!--      android:layout_marginRight="8dp"-->
+<!--      app:layout_constraintEnd_toEndOf="parent"-->
+<!--      app:layout_constraintHorizontal_bias="0.275"-->
+<!--      app:layout_constraintStart_toStartOf="parent"-->
+<!--      app:layout_constraintTop_toBottomOf="@+id/scaleView" />-->
+
+<!--  <TextView-->
+<!--      android:id="@+id/text_view_chess_anlysis2"-->
+<!--      android:layout_width="383dp"-->
+<!--      android:layout_height="24dp"-->
+
+<!--      android:layout_marginStart="8dp"-->
+<!--      android:layout_marginLeft="8dp"-->
+<!--      android:layout_marginTop="5dp"-->
+<!--      android:layout_marginEnd="8dp"-->
+<!--      android:layout_marginRight="8dp"-->
+<!--      app:layout_constraintEnd_toEndOf="parent"-->
+<!--      app:layout_constraintHorizontal_bias="0.0"-->
+<!--      app:layout_constraintStart_toStartOf="parent"-->
+<!--      app:layout_constraintTop_toBottomOf="@+id/text_view_chess_anlysis" />-->
+
+<!--  <TextView-->
+<!--      android:id="@+id/text_view_chess_anlysis3"-->
+<!--      android:layout_width="383dp"-->
+<!--      android:layout_height="24dp"-->
+
+<!--      android:layout_marginStart="8dp"-->
+<!--      android:layout_marginLeft="8dp"-->
+<!--      android:layout_marginTop="5dp"-->
+<!--      android:layout_marginEnd="8dp"-->
+<!--      android:layout_marginRight="8dp"-->
+<!--      app:layout_constraintEnd_toEndOf="parent"-->
+<!--      app:layout_constraintHorizontal_bias="0.0"-->
+<!--      app:layout_constraintStart_toStartOf="parent"-->
+<!--      app:layout_constraintTop_toBottomOf="@+id/text_view_chess_anlysis2" />-->
+
+  <ScrollView
+      android:id="@+id/scrolViewRes"
+      android:layout_width="match_parent"
+      android:layout_height="70dp"
+      android:layout_marginTop="5dp"
+      android:layout_marginBottom="18dp"
+      app:layout_constraintBottom_toTopOf="@+id/buttonsLayout"
       app:layout_constraintEnd_toEndOf="parent"
       app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toBottomOf="@+id/text_view_opening_info" />
+      app:layout_constraintTop_toBottomOf="@+id/scaleView">
+
+    <LinearLayout
+        android:id="@+id/layoutScroll"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical" />
+  </ScrollView>
 
   <TextView
       android:id="@+id/text_view_opening_info"
-      android:layout_width="321dp"
-      android:layout_height="29dp"
-      android:layout_marginStart="30dp"
-      android:layout_marginLeft="30dp"
-      android:layout_marginTop="20dp"
-      android:layout_marginEnd="30dp"
-      android:layout_marginRight="30dp"
+      android:layout_width="399dp"
+      android:layout_height="24dp"
+      android:layout_marginTop="36dp"
       android:gravity="center"
       app:layout_constraintEnd_toEndOf="parent"
       app:layout_constraintStart_toStartOf="parent"
       app:layout_constraintTop_toBottomOf="@+id/chessBoard" />
 
+  <TextView
+      android:id="@+id/text_view_secondPlayer"
+      android:layout_width="312dp"
+      android:layout_height="20dp"
+      android:layout_marginStart="28dp"
+      android:layout_marginLeft="28dp"
+      android:layout_marginTop="8dp"
+      android:gravity="left"
+      android:textSize="14sp"
+      android:textStyle="bold"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@+id/chessBoard" />
+
+  <TextView
+      android:id="@+id/text_view_firstPlayer"
+      android:layout_width="312dp"
+      android:layout_height="20dp"
+      android:layout_marginStart="29dp"
+      android:layout_marginLeft="29dp"
+      android:layout_marginBottom="8dp"
+      android:gravity="left"
+      android:textSize="14sp"
+      android:textStyle="bold"
+      app:layout_constraintBottom_toTopOf="@+id/chessBoard"
+      app:layout_constraintStart_toStartOf="parent" />
+
+  <views.ScaleView
+      android:id="@+id/scaleView"
+      android:layout_width="match_parent"
+      android:layout_height="25dp"
+      android:layout_marginTop="13dp"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@+id/text_view_opening_info" />
+
   <LinearLayout
       android:id="@+id/buttonsLayout"
       android:layout_width="365dp"
-      android:layout_height="48dp"
+      android:layout_height="40dp"
       android:layout_marginStart="20dp"
       android:layout_marginLeft="20dp"
       android:layout_marginEnd="20dp"
       android:layout_marginRight="20dp"
-      android:layout_marginBottom="7dp"
+      android:layout_marginBottom="15dp"
       android:orientation="horizontal"
       app:layout_constraintBottom_toBottomOf="parent"
       app:layout_constraintEnd_toEndOf="parent"
@@ -107,7 +188,7 @@
     <ImageButton
         android:id="@+id/imageButtonBack"
         android:layout_width="100dp"
-        android:layout_height="48dp"
+        android:layout_height="40dp"
         android:layout_weight="1"
         android:rotation="180"
 
@@ -117,9 +198,16 @@
     <ImageButton
         android:id="@+id/imageButtonNext"
         android:layout_width="100dp"
-        android:layout_height="48dp"
+        android:layout_height="40dp"
         android:layout_weight="1"
         app:srcCompat="@drawable/ic_action_step"
+        tools:ignore="SpeakableTextPresentCheck" />
+    <ImageButton
+        android:id="@+id/imageButtonReset"
+        android:layout_width="60dp"
+        android:layout_height="40dp"
+        android:layout_weight="1"
+        app:srcCompat="@drawable/ic_action_reset"
         tools:ignore="SpeakableTextPresentCheck" />
   </LinearLayout>
 

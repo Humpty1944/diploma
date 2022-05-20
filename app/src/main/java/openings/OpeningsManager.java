@@ -98,14 +98,14 @@ public class OpeningsManager {
     }
 
 
-    private Square fromAlgebraToSquare(String turn) {
-        int indCol = turn.length()>2? 1: 0;
-        int indRow = turn.length()>2? 2: 1;
-        int col = ((char) (turn.charAt(indCol) - '0') - 49);
-        if (Character.isDigit(turn.charAt(1))) {
-            return new Square(col, Character.getNumericValue(turn.charAt(indRow)) - 1);
-        } else {
-            return new Square(col, Character.getNumericValue(turn.charAt(indRow)) - 1);
-        }
-    }
+//    private Square fromAlgebraToSquare(String turn) {
+//        int indCol = turn.length()>2? 1: 0;
+//        int indRow = turn.length()>2? 2: 1;
+//        int col = ((char) (turn.charAt(indCol) - '0') - 49);
+//        if (Character.isDigit(turn.charAt(1))) {
+//            return new Square(col, Character.getNumericValue(turn.charAt(indRow)) - 1);
+//        } else {
+//            return new Square(col, Character.getNumericValue(turn.charAt(indRow)) - 1);
+//        }
+//    }
 }

@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import chessModel.ChessHistory;
 import chessModel.ChessHistoryStep;
 import chessModel.ChessMan;
-import chessModel.ChessPiece;
+//import chessModel.ChessPiece;
 import chessModel.Player;
 import chessModel.Square;
 import chessPiece.Piece;
@@ -22,5 +22,6 @@ public interface ChessInterface {
     public void updateHistory(boolean isNext, ChessHistoryStep step, int block);
     public void backMovePiece(ChessHistoryStep move);
     public void displayCurrOpening(Opening opening);
-    public void sendAndDisplayAnalysis(ChessHistoryStep step);
+    public void sendAndDisplayAnalysis(int block);
+    public void updatePromotion(ChessHistoryStep step);
 }

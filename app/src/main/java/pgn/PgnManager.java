@@ -34,6 +34,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import chessModel.ChessHistory;
 import chessModel.ChessHistoryStep;
@@ -43,11 +44,13 @@ import chessModel.Player;
 import chessModel.Square;
 import chessPiece.King;
 import chessPiece.Piece;
+import helpClass.FenUtil;
 
 public class PgnManager {
     private String path;
     private Context context;
-
+    PgnGame game;
+    FenUtil fenUtil = new FenUtil();
     public PgnManager(String path, Context context) {
         this.path = path;
         this.context = context;
@@ -61,12 +64,15 @@ public class PgnManager {
         AssetManager assetManager = context.getAssets();
         return assetManager.list("games");
     }
-
+    public String[] readDirContent(String folder) throws IOException {
+        AssetManager assetManager = context.getAssets();
+        return assetManager.list(folder);
+    }
     public String[] readFileNameAndDate(String fileName) {
         BufferedReader reader = null;
         String res = "";
         PgnGame game = new PgnGame();
-        System.out.println(context.getAssets());
+
         // InputStream assetInStream=null;
         try {
             // AssetManager   assetInStream=context.getAssets().;
@@ -83,7 +89,7 @@ public class PgnManager {
                 }
             }
 
-        } catch (IOException e) {
+        } catch (Exception e) {
             //log the exception
         } finally {
             if (reader != null) {
@@ -98,17 +104,18 @@ public class PgnManager {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.R)
-    public ChessModel readFile(String fileName) {
+    public ChessModel readFile(String fileName) throws Exception {
         BufferedReader reader = null;
         String res = "";
-        PgnGame game = new PgnGame();
+         game = new PgnGame();
         ChessModel model=null;
+        String mLine="";
         try {
             reader = new BufferedReader(
                     new InputStreamReader(context.getAssets().open("games/" + fileName), "UTF-8"));
 
             // do reading, usually loop until end of file reading
-            String mLine;
+
             while ((mLine = reader.readLine()) != null) {
                 //process line
                 if (!game.populateGame(mLine)) {
@@ -118,8 +125,11 @@ public class PgnManager {
             }
             model = gameData(res);
             model.setGameName(game.getEvent()+". "+game.getBlack()+" vs. "+game.getWhite());
+            model.setBlackPlayer(game.getBlack());
+            model.setWhitePlayer(game.getWhite());
         } catch (Exception e) {
-            System.out.println(e);
+
+            throw  new Exception();
             //log the exception
         } finally {
             if (reader != null) {
@@ -139,7 +149,7 @@ public class PgnManager {
        BufferedReader reader = null;
         FileInputStream fIn;
         String res = "";
-        PgnGame game = new PgnGame();
+         game = new PgnGame();
         File file = new File(fileName.toString());
         ChessModel model=null;
         try {
@@ -157,8 +167,11 @@ public class PgnManager {
             }
             model = gameData(res);
             model.setGameName(game.getEvent()+". "+game.getBlack()+" vs. "+game.getWhite());
-        } catch (IOException e) {
+            model.setBlackPlayer(game.getBlack());
+            model.setWhitePlayer(game.getWhite());
+        } catch (Exception e) {
             System.out.println(e);
+            return null;
             //log the exception
         } finally {
             if (reader != null) {
@@ -176,6 +189,7 @@ return model;
     @RequiresApi(api = Build.VERSION_CODES.R)
     private ChessModel gameData(String lines) {
         String newLines = lines.replace("\n", " ");
+        newLines = newLines.replace("...", "s");
         newLines = newLines.replace(".", ". ");
         ChessHistory.currCountStep=0;
         ChessHistory.chessHistory= new ArrayList<>();
@@ -193,26 +207,54 @@ return model;
             indexFirst = newLines.indexOf("{");
             indexLast = newLines.indexOf("}");
         }
+        indexFirst = newLines.indexOf("(");
+         indexLast = newLines.indexOf(")");
+        while (indexFirst != -1 && indexLast != -1) {
+            String toBeReplaced = newLines.substring(indexFirst , indexLast+1);
+            newLines = newLines.replace(toBeReplaced, "");
+            indexFirst = newLines.indexOf("(");
+            indexLast = newLines.indexOf(")");
+        }
         newLines = newLines.replace("x","");
         newLines = newLines.replace("+","");
         newLines = newLines.replace("#","");
+        newLines = newLines.replace("]","");
+        newLines = newLines.replace("[","");
+        newLines = newLines.replace("\"","");
         //newLines = newLines.replace("1-0","");
         newLines = newLines.replace("!","");
         newLines = newLines.replace("?","");
         String[] newLine = newLines.split(" ");
-
         ChessModel model = new ChessModel();
+        Boolean isMoreMiss=false;
+        if(game.getFen()!="") {
+           Set<Piece> pieces =  ChessHistory.readFen(game.getFen());
+         //  ChessHistory.currPlayer=Player.WHITE;
+           model.setFen(game.getFen());
+           model.setPieceBox(pieces);
+           model.setCurrPlayer(ChessHistory.currPlayer);
+        }
         for (int i = 0; i < newLine.length; i++) {
-            if(i==62){
-                boolean flag=true;
-                System.out.println(flag);
-
-            }
+//            if(i==62){
+//                boolean flag=true;
+//                System.out.println(flag);
+//
+//            }
             if(newLine[i].contains("1-0")||newLine[i].contains("1-1")||newLine[i].contains("0-0")||newLine[i].contains("0-1")||newLine[i].contains("*")||newLine[i].contains("2-")){
                 break;
             }
 
             if (newLine[i].contains(".")||newLine[i].equals("")||newLine[i].equals(" ")) {
+                continue;
+            }
+            if(newLine[i].equals("s")){
+                if(game.getFen()==""||isMoreMiss){
+                    return null;
+                }
+                model.setChessHistorySteps(new ChessHistoryStep());
+                ChessHistory.currPlayer=Player.BLACK;
+                model.setCurrPlayer(Player.BLACK);
+                isMoreMiss=true;
                 continue;
             }
            // List<ChessHistoryStep>s =   ChessHistory.chessHistory;
@@ -244,36 +286,58 @@ return model;
 //
 //                }
                 String lineWork = newLine[i];
+                if(lineWork.equals("e8=Q")){
+                boolean flag=true;
+                System.out.println(flag);
+//
+            }
 //                String lineWork = newLine[i].replace("x","");
 //                lineWork = lineWork.replace("+","");
 //                lineWork = lineWork.replace("#","");
 //                lineWork = lineWork.replace("1-0","");
 //                lineWork = lineWork.replace("!","");
 //                lineWork = lineWork.replace("?","");
-                int ind = 0;  int send=-1;
+                int ind = 0;  int colSpec=-1;
+                int rowSpec=-1;
                 int promInd=-1;
                 if (chessMan == ChessMan.KING &&
                         Character.UnicodeBlock.of(lineWork.charAt(0)).equals(Character.UnicodeBlock.CYRILLIC)) {
                      ind = lineWork.length()>=5? 3: 2;
-                     send = lineWork.length()>=5? ((char) (lineWork.charAt(2) - '0') - 49): -1;
+
+                     colSpec = lineWork.length()>=5? ((char) (lineWork.charAt(2) - '0') - 49): -1;
                     to = fromAlgebraToSquare(lineWork.substring(ind, lineWork.length()));
                 } else if (chessMan == ChessMan.PAWN) {
                     ind = lineWork.length()>=3? 1: 0;
-                    send = lineWork.length()>=3? ((char) (lineWork.charAt(0) - '0') - 49): -1;
+//                    colSpec = lineWork.length()>=3? ((char) (lineWork.charAt(0) - '0') - 49): -1;
+                    if(lineWork.length()>=3){
+                        if(Character.isLetter(lineWork.charAt(0))){
+                            colSpec =  ((char) (lineWork.charAt(0) - '0') - 49);
+                        }else if(Character.isDigit(lineWork.charAt(0))){
+                            rowSpec=Integer.parseInt(String.valueOf(lineWork.charAt(0)))-1;
+                        }
+                    }
+
                      promInd = lineWork.indexOf("=");
                     if(promInd!=-1) {
-                        to = fromAlgebraToSquare(lineWork.substring(ind, promInd));
+                        to = fromAlgebraToSquare(lineWork.substring(0, promInd));
                     }else{
                         to = fromAlgebraToSquare(lineWork.substring(ind, lineWork.length()));
                     }
 
                 } else {
-                    send = lineWork.length()>=4? ((char) (lineWork.charAt(1) - '0') - 49): -1;
+//                    colSpec = lineWork.length()>=4? ((char) (lineWork.charAt(1) - '0') - 49): -1;
+                    if( lineWork.length()>=4){
+                        if(Character.isLetter(lineWork.charAt(1))){
+                            colSpec =  ((char) (lineWork.charAt(1) - '0') - 49);
+                        }else if(Character.isDigit(lineWork.charAt(1))){
+                            rowSpec=Integer.parseInt(String.valueOf(lineWork.charAt(1)))-1;
+                        }
+                    }
                     ind = lineWork.length()>=4? 2: 1;
                     to = fromAlgebraToSquare(lineWork.substring(ind, lineWork.length()));
                 }
                 ArrayList<ChessHistoryStep> steps = ChessHistory.chessHistory;
-                Piece piece = findPieceCanMove(to, chessMan, model,send );
+                Piece piece = findPieceCanMove(to, chessMan, model,colSpec, rowSpec );
 //                if(ChessHistory.currCountStep!=ChessHistory.chessHistory.size()||ChessHistory.currCountStep==40){
 //                    System.out.println("wtf");
 //                }
@@ -292,7 +356,7 @@ return model;
                 else if (piece != null) {
                     model.movePiece(piece.getSquare(), to);
                 }
-                System.out.println(piece);
+                System.out.println(model.getChessHistorySteps().get(model.getChessHistorySteps().size()-1).getCurrStep());
             }
 
         }
@@ -309,15 +373,24 @@ private void promotionHistory(Piece piece, Square to, int promInd, String lineWo
     model.getChessHistorySteps().get(model.getChessHistorySteps().size()-1).setPromoted(true);
 
 }
-    private Piece findPieceCanMove(Square to, ChessMan chessMan, ChessModel chessModel, int ind) {
+    private Piece findPieceCanMove(Square to, ChessMan chessMan, ChessModel chessModel, int col, int row) {
         for (Piece p : chessModel.getPieces()) {
             if (p.getChessMan() == chessMan) {
-                if(ind!=-1){
-                  //  if (p.canMove(p.getSquare(), to)&&p.getPlayer()==ChessHistory.currPlayer&&p.getCol()==ind) {//check color
-                    if(p.canMove(p.getSquare(), to)&&p.getPlayer()==chessModel.getCurrPlayer()&&p.getCol()==ind){
+                if(col!=-1&&row!=-1){
+                    if(p.canMove(p.getSquare(), to)&&p.getPlayer()==chessModel.getCurrPlayer()&&p.getCol()==col&&p.getRow()==row){
                         return p;
                     }
-                }//else if (p.canMove(p.getSquare(), to)&&p.getPlayer()==ChessHistory.currPlayer) {
+                }
+                if(col!=-1){
+
+                    if(p.canMove(p.getSquare(), to)&&p.getPlayer()==chessModel.getCurrPlayer()&&p.getCol()==col){
+                        return p;
+                    }
+                }else if(row!=-1){
+                    if(p.canMove(p.getSquare(), to)&&p.getPlayer()==chessModel.getCurrPlayer()&&p.getRow()==row){
+                        return p;
+                    }
+                }
                 else if (p.canMove(p.getSquare(), to)&&p.getPlayer()==chessModel.getCurrPlayer()){// check color
                     return p;
                 }
@@ -379,7 +452,7 @@ private void promotionHistory(Piece piece, Square to, int promInd, String lineWo
         }
     }
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-    public void saveGame(ArrayList<ChessHistoryStep> chessHistorySteps){
+    public void saveGame(ArrayList<ChessHistoryStep> chessHistorySteps, String fen){
         Date currentTime = Calendar.getInstance().getTime();
         Calendar calendar = new GregorianCalendar();
         calendar.setTime(currentTime);
@@ -389,7 +462,12 @@ private void promotionHistory(Piece piece, Square to, int promInd, String lineWo
         res+="[Round \"?\"]\n";
         res+="[Result \"?\"]\n";
         res+="[White \"Player1\"]\n";
-        res+="[Black \"Player2\"]\n\n";
+        res+="[Black \"Player2\"]\n";
+        if(fen!=""){
+            fen = fen.replace("\n","");
+            res+= "[FEN \""+fen+"\"]\n";
+        }
+        res+="\n";
         res+=ChessHistory.makeGame(chessHistorySteps);
 //        File extDir = Environment.getExternalStorageDirectory();
 //        String root = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS).toString();

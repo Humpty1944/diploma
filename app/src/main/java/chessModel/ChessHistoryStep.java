@@ -36,6 +36,10 @@ public class ChessHistoryStep {
         from="";
         to="";
         chessPiece=null;
+        whiteNumberTurn=1;
+        this.currStep=turnToNotationShow( 1,  1);;
+        currMoveCount=1;
+
     }
     public ChessHistoryStep(  String from, String to, Piece chessPiece){
         this.from=from;
@@ -106,12 +110,13 @@ public class ChessHistoryStep {
 
     public String turnToNotationShow(int row, int col){
         String res="";
+        if(chessPiece==null){
+            return getWhiteNumberTurn()+". ...";
+        }
         if(chessPiece.getPlayer()==Player.WHITE){
             res+=Integer.toString(getWhiteNumberTurn())+". ";
         }
-        if(isCasteling!=0){
-            System.out.println("dfdsfd");
-        }
+
         if(isCasteling==1){
             res+= "O-O";
         }else if (isCasteling==2){
@@ -120,9 +125,9 @@ public class ChessHistoryStep {
             String currPlace = turnToNotation(row, col);
             String currPiece = getCurrType();
 
-
             if (isPromoted) {
-                res += Character.toString((char) ((char) (fromSquare.getCol() + '0') + 49)) + "=" + ChessHistory.getStringType(promotedType);
+                res +=currPlace+ "=" + ChessHistory.getStringType(promotedType);
+                return res;
             }
             if (capturePiece != null) {
                 if (chessPiece.getChessMan() == ChessMan.PAWN) {
@@ -132,9 +137,15 @@ public class ChessHistoryStep {
                 }
                 res += "x";
                 res += currPlace;
+                if(ChessHistory.isCheck){
+                    res+="+";
+                }
                 return res;
             } else {
                 res += currPiece + currPlace;
+                if(ChessHistory.isCheck){
+                    res+="+";
+                }
                 return res;
             }
         }
@@ -172,6 +183,7 @@ public class ChessHistoryStep {
         return from + " " + to;
     }
     public static String turnToNotation(int row, int col){
+
         String result = "";
         String fromCh = Character.toString((char) ((char) (col + '0') + 49));
         result+=fromCh+(row+1);
@@ -179,6 +191,9 @@ public class ChessHistoryStep {
     }
 
     public static String turnToNotation(Square square){
+        if(square==null){
+            return "-";
+        }
         String result = "";
         String fromCh = Character.toString((char) ((char) (square.getCol() + '0') + 49));
         result+=fromCh+(square.getRow()+1);

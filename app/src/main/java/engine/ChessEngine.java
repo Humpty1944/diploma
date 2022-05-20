@@ -50,42 +50,42 @@ public class ChessEngine {
         return Uri.parse("content://" + authority + "/" + fileName);
     }
 
-    public File copyToFiles(ContentResolver contentResolver, File destination)
-            throws IOException {
-        Uri uri = getUri();
-        File output = new File(destination, uri.getPath().toString());
-        copyUri(contentResolver, uri, output.getAbsolutePath());
-        return output;
-    }
+//    public File copyToFiles(ContentResolver contentResolver, File destination)
+//            throws IOException {
+//        Uri uri = getUri();
+//        File output = new File(destination, uri.getPath().toString());
+//        copyUri(contentResolver, uri, output.getAbsolutePath());
+//        return output;
+//    }
 
-    public void copyUri(final ContentResolver contentResolver,
-            final Uri source, String targetFilePath) throws IOException {
-        InputStream istream = contentResolver.openInputStream(source);
-        copyFile(istream, targetFilePath);
-        setExecutablePermission(targetFilePath);
-    }
+//    public void copyUri(final ContentResolver contentResolver,
+//            final Uri source, String targetFilePath) throws IOException {
+//        InputStream istream = contentResolver.openInputStream(source);
+//        copyFile(istream, targetFilePath);
+//        setExecutablePermission(targetFilePath);
+//    }
 
-    private void copyFile(InputStream istream, String targetFilePath) throws IOException {
-        new File(targetFilePath).delete();
-        FileOutputStream fout = new FileOutputStream(targetFilePath);
-        byte[] b = new byte[1024];
-        int numBytes = 0;
-        while ((numBytes = istream.read(b)) != -1) {
-            fout.write(b, 0, numBytes);
-        }
-        istream.close();
-        fout.close();
-    }
+//    private void copyFile(InputStream istream, String targetFilePath) throws IOException {
+//        new File(targetFilePath).delete();
+//        FileOutputStream fout = new FileOutputStream(targetFilePath);
+//        byte[] b = new byte[1024];
+//        int numBytes = 0;
+//        while ((numBytes = istream.read(b)) != -1) {
+//            fout.write(b, 0, numBytes);
+//        }
+//        istream.close();
+//        fout.close();
+//    }
 
-    private void setExecutablePermission(String engineFileName) throws IOException {
-        String cmd[] = { "chmod", "744", engineFileName };
-        Process process = Runtime.getRuntime().exec(cmd);
-        try {
-            process.waitFor();
-        } catch (InterruptedException e) {
-            Log.e(TAG, e.getMessage(), e);
-        }
-    }
+//    private void setExecutablePermission(String engineFileName) throws IOException {
+//        String cmd[] = { "chmod", "744", engineFileName };
+//        Process process = Runtime.getRuntime().exec(cmd);
+//        try {
+//            process.waitFor();
+//        } catch (InterruptedException e) {
+//            Log.e(TAG, e.getMessage(), e);
+//        }
+//    }
 
     public String getPackageName() {
         return packageName;

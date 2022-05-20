@@ -26,22 +26,22 @@ public class InternalStockFish extends ExternalEngine {
         super("", workDir, report, appContext, engineName);
     }
 
-    @Override
-    protected File getOptionsFile() {
-        File extDir = appContext.getExternalFilesDir(null);//Environment.getExternalStorageDirectory();
-        return new File(extDir, "/DroidFish/uci/stockfish.ini");
-    }
-
-    @Override
-    protected boolean editableOption(String name) {
-        name = name.toLowerCase(Locale.US);
-        if (!super.editableOption(name))
-            return false;
-        if (name.equals("skill level") || name.equals("write debug log") ||
-                name.equals("write search log"))
-            return false;
-        return true;
-    }
+//    @Override
+//    protected File getOptionsFile() {
+//        File extDir = appContext.getExternalFilesDir(null);//Environment.getExternalStorageDirectory();
+//        return new File(extDir, "/DroidFish/uci/stockfish.ini");
+//    }
+//
+//    @Override
+//    protected boolean editableOption(String name) {
+//        name = name.toLowerCase(Locale.US);
+//        if (!super.editableOption(name))
+//            return false;
+//        if (name.equals("skill level") || name.equals("write debug log") ||
+//                name.equals("write search log"))
+//            return false;
+//        return true;
+//    }
 
     private long readCheckSum(File f) {
         try (InputStream is = new FileInputStream(f);
@@ -102,15 +102,15 @@ public class InternalStockFish extends ExternalEngine {
     }
 
     /** Copy the Stockfish default network file to "exeDir" if it is not already there. */
-    private void copyNetFile(File exeDir) throws IOException {
-        defaultNetFile = new File(exeDir, defaultNet);
-        if (defaultNetFile.exists())
-            return;
-        File tmpFile = new File(exeDir, defaultNet + ".tmp");
-        copyAssetFile(defaultNet, tmpFile);
-        if (!tmpFile.renameTo(defaultNetFile))
-            throw new IOException("Rename failed");
-    }
+//    private void copyNetFile(File exeDir) throws IOException {
+//        defaultNetFile = new File(exeDir, defaultNet);
+//        if (defaultNetFile.exists())
+//            return;
+//        File tmpFile = new File(exeDir, defaultNet + ".tmp");
+//        copyAssetFile(defaultNet, tmpFile);
+//        if (!tmpFile.renameTo(defaultNetFile))
+//            throw new IOException("Rename failed");
+//    }
 
     /** Copy a file resource from the AssetManager to the file system,
      *  so it can be used by native code like the Stockfish engine. */

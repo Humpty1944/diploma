@@ -5,11 +5,28 @@
       app:key="engineList"
       app:title="Текущий движок"
       app:useSimpleSummaryProvider="true"/>
+
     <EditTextPreference
         app:key="depth"
         app:title="Глубина поиска"
+        app:defaultValue="20"
         app:useSimpleSummaryProvider="true"/>
+  <EditTextPreference
+      app:key="hashType"
+      app:title="Размер хэш-таблицы"
+      app:defaultValue="16"
+      app:useSimpleSummaryProvider="true"/>
+  <EditTextPreference
+      app:key="multiPv"
+      app:title="Количество выходных строк анализа"
+      app:defaultValue="1"
+      app:useSimpleSummaryProvider="true"/>
 
+  <EditTextPreference
+      app:key="treadsCount"
+      app:title="Количество потоков для анализа"
+      app:defaultValue="1"
+      app:useSimpleSummaryProvider="true"/>
     <Preference
         app:key="newEngine"
         app:summary="Необходимо выбрать файл, предназначенный для данной системы"

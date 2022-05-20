@@ -3,16 +3,20 @@ package pgn;
 import java.util.List;
 
 import chessModel.ChessHistoryStep;
+import helpClass.FenUtil;
 
 public class PgnGame {
-    private String event;
-    private String site;
-    private String date;
-    private String round;
-    private String white;
-    private String black;
-    private String result;
+    private String event="?";
+    private String site="?";
+    private String date="?";
+    private String round="?";
+    private String white="?";
+    private String black="?";
+    private String result="?";
+    private String fen="";
     private List<ChessHistoryStep> steps;
+
+    FenUtil fenUtil = new FenUtil();
 
     public PgnGame(){
 
@@ -22,35 +26,44 @@ public class PgnGame {
 
     }
 
-    public boolean populateGame(String line){
+    public boolean populateGame(String line) throws Exception{
         String[] data = line.split(" ");
-        if(data.length==0||line==""){
-            return true;
-        }
-        if(data[0].toLowerCase().contains("event")&&!data[0].toLowerCase().contains("date")){
-            this.event =  line.split("\"")[1];
-            return true;
-        }else if (data[0].toLowerCase().contains("site")){
-            this.site =  line.split("\"")[1];
-            return true;
-        }else if (data[0].toLowerCase().contains("date")&&!data[0].toLowerCase().contains("event")){
-            this.date =  line.split("\"")[1];
-            return true;
-        }else if (data[0].toLowerCase().contains("round")){
-            this.round = line.split("\"")[1];
-            return true;
-        }else if (data[0].toLowerCase().contains("result")){
-            this.result = line.split("\"")[1];
-            return true;
-        }else if (data[0].toLowerCase().contains("white")&&!data[0].toLowerCase().contains("elo")){
-            this.white =  line.split("\"")[1];
-            return true;
-        }else if (data[0].toLowerCase().contains("black")&&!data[0].toLowerCase().contains("elo")){
-            this.black =  line.split("\"")[1];
-            return true;
-        }
-        if(line.contains("[")){
-            return true;
+        try {
+            if (data.length == 0 || line == "") {
+                return true;
+            }
+            if(data[0].toLowerCase().contains("fen")){
+                if(fenUtil.checkFen( line.split("\"")[1])) {
+                    this.fen = line.split("\"")[1];
+                }
+            }
+            if (data[0].toLowerCase().contains("event") && !data[0].toLowerCase().contains("date")) {
+                this.event = line.split("\"")[1];
+                return true;
+            } else if (data[0].toLowerCase().contains("site")) {
+                this.site = line.split("\"")[1];
+                return true;
+            } else if (data[0].toLowerCase().contains("date") && !data[0].toLowerCase().contains("event")) {
+                this.date = line.split("\"")[1];
+                return true;
+            } else if (data[0].toLowerCase().contains("round")) {
+                this.round = line.split("\"")[1];
+                return true;
+            } else if (data[0].toLowerCase().contains("result")) {
+                this.result = line.split("\"")[1];
+                return true;
+            } else if (data[0].toLowerCase().contains("white") && !data[0].toLowerCase().contains("elo")) {
+                this.white = line.split("\"")[1];
+                return true;
+            } else if (data[0].toLowerCase().contains("black") && !data[0].toLowerCase().contains("elo")) {
+                this.black = line.split("\"")[1];
+                return true;
+            }
+            if (line.contains("[")) {
+                return true;
+            }
+        }catch (Exception e){
+            return false;
         }
         return false;
     }
@@ -116,5 +129,13 @@ public class PgnGame {
 
     public void setSteps(List<ChessHistoryStep> steps) {
         this.steps = steps;
+    }
+
+    public String getFen() {
+        return fen;
+    }
+
+    public void setFen(String fen) {
+        this.fen = fen;
     }
 }

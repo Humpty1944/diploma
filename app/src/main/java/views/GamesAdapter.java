@@ -57,7 +57,11 @@ public class GamesAdapter  extends RecyclerView.Adapter<views.GamesAdapter.MyVie
                // Toast.makeText(view.getContext(), "aaa",Toast.LENGTH_LONG).show();
                 row_index=position;
 
-                chessHistoryInterfaceCallbacks.onClick(position);
+                try {
+                    chessHistoryInterfaceCallbacks.onClick(position);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
                 notifyDataSetChanged();
             }
         });

@@ -15,10 +15,13 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Adapter;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -52,6 +55,7 @@ import pgn.PgnManager;
 import views.ChessBoardView;
 import views.ChessHistoryAdapter;
 import views.GamesAdapter;
+import views.MasterAdapter;
 import views.OpeningAdapter;
 import views.PromotionView;
 
@@ -59,7 +63,8 @@ import views.PromotionView;
 public class PlaysTable extends Fragment {
     View view;
     TableLayout tableLayout;
-    private GamesAdapter mAdapter;
+   // private GamesAdapter mAdapter;
+    MasterAdapter mAdapter;
     ConstraintLayout layout;
     RecyclerView recyclerView;
     int wrapContent = ConstraintLayout.LayoutParams.WRAP_CONTENT;
@@ -117,18 +122,29 @@ public class PlaysTable extends Fragment {
     private void populateWithPlays() throws IOException {
         PgnManager manager = new PgnManager(getActivity().getApplicationContext());
        String[] fileNames = manager.getAllFilesName();
-       List<String[]> fileInfo = new ArrayList<>();
+       List<String> fileInfo = new ArrayList<>();
        for(int i=0;i<fileNames.length;i++){
-           fileInfo.add(manager.readFileNameAndDate(fileNames[i]));
+           String correctName = fileNames[i].replace("_", " ");
+           fileInfo.add(correctName);
        }
-        mAdapter = new GamesAdapter(fileInfo, new ChessHistoryInterfaceCallbacks() {
+
+        mAdapter = new MasterAdapter(fileInfo, new ChessHistoryInterfaceCallbacks() {
             @Override
-            public void onClick(Object object) {
-                MainActivity mainActivity = (MainActivity) getActivity();
-                int pos = (Integer) object;
-                byte type=0;
-                ChessModel model = manager.readFile(fileNames[pos]);
-                mainActivity.changeFragment(type, model,null);
+            public void onClick(Object object)  {
+               MainActivity mainActivity = (MainActivity) getActivity();
+//                int pos = (Integer) object;
+//                byte type=0;
+//                try {
+//                    ChessModel model = manager.readFile(fileNames[pos]);
+//                    if(model==null){
+//                        Toast.makeText(getContext(), "Файл нельзя загрузить из-за ошибки в тексте.", Toast.LENGTH_LONG).show();
+//                    }else {
+                       mainActivity.changeFragments(object);
+//                    }
+//                }
+//               catch (Exception e){
+//                    Toast.makeText(getContext(), "Файл нельзя загрузить из-за ошибки в тексте.", Toast.LENGTH_LONG).show();
+//                }
             }
         });
         recyclerView.setAdapter(mAdapter);

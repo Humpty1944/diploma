@@ -59,7 +59,11 @@ public class OpeningAdapter extends RecyclerView.Adapter<OpeningAdapter.MyViewHo
                 Toast.makeText(view.getContext(), "aaa",Toast.LENGTH_LONG).show();
                 row_index=position;
 
-                chessHistoryInterfaceCallbacks.onClick(openingList.get(holder.getAdapterPosition()));
+                try {
+                    chessHistoryInterfaceCallbacks.onClick(openingList.get(holder.getAdapterPosition()));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
                 notifyDataSetChanged();
             }
         });

@@ -17,13 +17,13 @@ public interface UCIEngine {
    // void initOptions(EngineOptions engineOptions);
 
     /** Read UCI options from .ini file and send them to the engine. */
-    void applyIniFile();
+ //   void applyIniFile();
 
     /** Set engine UCI options. */
-    boolean setUCIOptions(Map<String,String> uciOptions);
+   // boolean setUCIOptions(Map<String,String> uciOptions);
 
     /** Save non-default UCI option values to file. */
-    void saveIniFile(UCIOptions options);
+   // void saveIniFile(UCIOptions options);
 
     /** Get engine UCI options. */
     UCIOptions getUCIOptions();
@@ -49,7 +49,7 @@ public interface UCIEngine {
 
     /** Temporarily set the engine Elo strength to use for the next search.
      *  Integer.MAX_VALUE means full strength. */
-    void setEloStrength(int elo);
+   // void setEloStrength(int elo);
 
     /** Set an engine integer option. */
     void setOption(String name, int value);
@@ -67,5 +67,5 @@ public interface UCIEngine {
 
     /** Register an option as supported by the engine.
      * @param tokens  The UCI option line sent by the engine, split in words. */
-    UCIOptions.OptionBase registerOption(String[] tokens);
+//    UCIOptions.OptionBase registerOption(String[] tokens);
 }

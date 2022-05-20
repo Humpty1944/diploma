@@ -8,16 +8,16 @@ public class LocalPipe {
     private boolean closed = false;
 
     /** Write a line to the pipe. */
-    public final synchronized void printLine(String format) {
-        String s = String.format(Locale.US, format, new Object[]{});
-        addLine(s);
-    }
+//    public final synchronized void printLine(String format) {
+//        String s = String.format(Locale.US, format, new Object[]{});
+//        addLine(s);
+//    }
 
     /** Write a line to the pipe. */
-    public final synchronized void printLine(String format, Object ... args) {
-        String s = String.format(Locale.US, format, args);
-        addLine(s);
-    }
+//    public final synchronized void printLine(String format, Object ... args) {
+//        String s = String.format(Locale.US, format, args);
+//        addLine(s);
+//    }
 
     public final synchronized void addLine(String line) {
         while (lines.size() > 10000) {
@@ -31,9 +31,9 @@ public class LocalPipe {
     }
 
     /** Read a line from the pipe. Returns null on failure. */
-    public final synchronized String readLine() {
-        return readLine(-1);
-    }
+//    public final synchronized String readLine() {
+//        return readLine(-1);
+//    }
 
     /** Read a line from the pipe. Returns null on failure. Returns empty string on timeout. */
     public final synchronized String readLine(int timeoutMillis) {
@@ -59,6 +59,7 @@ public class LocalPipe {
     /** Close pipe. Makes readLine() return null. */
     public final synchronized void close() {
         closed = true;
+        System.out.println("Pipe is close");
         notify();
     }
 

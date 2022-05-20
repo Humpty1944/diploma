@@ -32,7 +32,8 @@ import java.util.Set;
 
 import chessModel.ChessHistory;
 import chessModel.ChessMan;
-import chessModel.ChessPiece;
+//import chessModel.ChessPiece;
+import chessModel.Player;
 import chessModel.Square;
 import chessPiece.King;
 import chessPiece.Piece;
@@ -85,6 +86,10 @@ public class ChessBoardView extends View {
 
     private final Map<Integer, Bitmap> bitmaps = new HashMap<Integer, Bitmap>();
 
+    public void setMovingPiece(Piece movingPiece) {
+        this.movingPiece = movingPiece;
+    }
+
     public ChessBoardView(Context context) {
         super(context);
         setWillNotDraw(false);
@@ -102,7 +107,12 @@ public class ChessBoardView extends View {
         setWillNotDraw(false);
         loadBitmap();
     }
-
+    public void reset(){
+        movingPiece=null;
+        checkKing=null;
+        isClickable=true;
+        pressStartTime=0;
+    }
 
     @Override
     protected void onDraw(Canvas canvas) {
@@ -121,7 +131,7 @@ public class ChessBoardView extends View {
            // if((ChessHistory.isCheck&&movingPiece instanceof King)||!ChessHistory.isCheck) {
                 paint.setColor(Color.BLUE);
                 ArrayList<PointF> p;
-                if(ChessHistory.isCheck){
+                if(checkKing!=null){
                     p=movingPiece.helpCoordCheck(originX, originY, cellSize);
                 }else{
                     p=movingPiece.helpCoord(originX, originY, cellSize);
@@ -134,21 +144,12 @@ public class ChessBoardView extends View {
                 }
             //}
         }
-       if(checkKing!=null&&ChessHistory.isCheck){
+       if(checkKing!=null){
             checkDraw(canvas, checkKing.getCol(), checkKing.getRow());
             //checkKing=null;
         }
     }
 
-    private String translateToAlgebraNotation(int fromRow, int fromCol, int toRow, int toCol) {
-
-        String fromCh = Character.toString((char) ((char) (fromCol + '0') + 49));
-        String toCH = Character.toString((char) ((char) (toCol + '0') + 49));
-        String from = fromCh + (char) (fromRow + '1');
-        String to = toCH + (char) (toRow + '1');
-
-        return from + " " + to;
-    }
 
 
     @Override
@@ -188,6 +189,7 @@ public class ChessBoardView extends View {
                         toRow = 7 - (int) ((event.getY() - originY) / cellSize);
                         if (toCol != fromCol || toRow != fromRow) {
                             Piece findPiece = chessInterface.pieceAt(new Square(toCol, toRow));
+                            Piece pieceHelp = checkKing;
                             if (findPiece != null && findPiece.getPlayer() == movingPiece.getPlayer()) {
                                 movingPiece = findPiece;
                                 movingPieceBitmap =  bitmaps.get(findPiece.getResID());
@@ -195,24 +197,44 @@ public class ChessBoardView extends View {
                                 fromRow = 7 - (int) ((event.getY() - originY) / cellSize);
                                 invalidate();
                             }else {
-                                if ((movingPiece instanceof King || (fromCol != toCol || fromRow != toRow)) && ChessHistory.isCheck) {
-                                    ChessHistory.isCheck = false;
-                                    checkKing = null;
+                                if ((movingPiece instanceof King || (fromCol != toCol || fromRow != toRow)) && checkKing!=null){//&&movingPiece.canMove(new Square(fromCol, fromRow), new Square(toCol, toRow))) {
+//                                    ChessHistory.isCheck = false;
+//                                    checkKing = null;
                                     chessInterface.movePiece(new Square(fromCol, fromRow), new Square(toCol, toRow));
-                                    ChessHistory.checkPiece = null;
+//                                    ChessHistory.checkPiece = null;
+//                                    ChessHistory.checkingPiece = null;
+                                    if(!((King) checkKing).isCheck()){
+                                        ChessHistory.isCheck = false;
+                                        checkKing = null;
+                                        ChessHistory.checkPiece = null;
                                     ChessHistory.checkingPiece = null;
+
+
+                                    }
+                                    if(ChessHistory.currPlayer==pieceHelp.getPlayer()){
+                                        ChessHistory.currPlayer = ChessHistory.currPlayer== Player.WHITE? Player.BLACK: Player.WHITE;
+                                    }
                                     invalidate();
                                 }
 //                       else if(ChessHistory.isCheck&&(ChessHistory.checkingPiece.canMove(ChessHistory.checkingPiece.getSquare(), new Square(toCol, toRow) )||
 //                                movingPiece.canMove(movingPiece.getSquare(), ChessHistory.checkingPiece.getSquare()))) {
-                                else if (ChessHistory.isCheck && (movingPiece.canMove(movingPiece.getSquare(), ChessHistory.checkingPiece.getSquare()) || movingPiece.checkProtect(new Square(fromCol, fromRow), new Square(toCol, toRow)))) {
+                                else if (checkKing!=null){ //&&movingPiece.canMove(new Square(fromCol, fromRow), new Square(toCol, toRow))){ //(movingPiece.canMove(movingPiece.getSquare(), ChessHistory.checkingPiece.getSquare()) || movingPiece.checkProtect(new Square(fromCol, fromRow), new Square(toCol, toRow)))) {
                                     chessInterface.movePiece(new Square(fromCol, fromRow), new Square(toCol, toRow));
-                                    ChessHistory.isCheck = false;
-                                    ChessHistory.checkPiece = null;
-                                    ChessHistory.checkingPiece = null;
-                                    checkKing = null;
+                                    if(!((King) checkKing).isCheck()){
+                                        ChessHistory.isCheck = false;
+                                        checkKing = null;
+                                        ChessHistory.checkPiece = null;
+                                        ChessHistory.checkingPiece = null;
+                                    }
+                                    if(ChessHistory.currPlayer==pieceHelp.getPlayer()){
+                                        ChessHistory.currPlayer = ChessHistory.currPlayer== Player.WHITE? Player.BLACK: Player.WHITE;
+                                    }
+//                                    ChessHistory.isCheck = false;
+//                                    ChessHistory.checkPiece = null;
+//                                    ChessHistory.checkingPiece = null;
+                                 //   checkKing = null;
 
-                                } else if (!ChessHistory.isCheck) {
+                                } else if (checkKing==null) {
                                     chessInterface.movePiece(new Square(fromCol, fromRow), new Square(toCol, toRow));
 
                                 } else {
@@ -235,23 +257,13 @@ public class ChessBoardView extends View {
         return true;
     }
 
-    private void addBorder(int row, int col, Bitmap bmp) {
-        Bitmap bmpWithBorder = Bitmap.createBitmap(bmp.getWidth(), bmp.getHeight(), bmp.getConfig());
-        Canvas canvas = new Canvas(bmpWithBorder);
-        canvas.drawColor(Color.argb(100, 222, 215, 122));
-        RectF borderSize = new RectF(originX + col * cellSize, originY + (7 - row) * cellSize, originX + (col + 1) * cellSize, originY + (7 - row + 1) * cellSize);
-        // canvas.drawBitmap(bmp,null, borderSize, paint);
-        c.drawBitmap(bmpWithBorder, null, borderSize, paint);
-        //return bmpWithBorder;
-//        paint.setColor(Color.BLACK);
-//        c.drawRect(originX + col * cellSize, originY + (7 - row) * cellSize, originX + (col + 1) * cellSize, originY + (7 - row + 1) * cellSize, paint);
-        //c.drawRect(1000, 1000, 2000, 2000, paint);
-        // invalidate();
-    }
+
 
     private void loadBitmap() {
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inSampleSize=11;
         for (Integer it : imgChess) {
-            bitmaps.put(it, BitmapFactory.decodeResource(getResources(), it));
+            bitmaps.put(it, BitmapFactory.decodeResource(getResources(), it, options));
 
         }
     }
@@ -288,7 +300,7 @@ public class ChessBoardView extends View {
             for (int col = 0; col < 8; col++) {
                 if ((col==2||col==3)&&(row==7||row==6)){
                     boolean flag=false;
-                    System.out.println(flag);
+
                 }
                 Piece piece = chessInterface.pieceAt(new Square(col, row));
 
@@ -298,9 +310,9 @@ public class ChessBoardView extends View {
                 }
             }
         }
-        if (movingPieceBitmap != null) {
-            canvas.drawBitmap(movingPieceBitmap, null, new RectF(movingPieceX - cellSize / 2, movingPieceY - cellSize / 2, movingPieceX + cellSize / 2, movingPieceY + cellSize / 2), paint);
-        }
+//        if (movingPieceBitmap != null) {
+//            canvas.drawBitmap(movingPieceBitmap, null, new RectF(movingPieceX - cellSize / 2, movingPieceY - cellSize / 2, movingPieceX + cellSize / 2, movingPieceY + cellSize / 2), paint);
+//        }
     }
 
     private void drawPieceAt(Canvas canvas, int col, int row, Integer resID) {

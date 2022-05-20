@@ -22,9 +22,34 @@ public void setCheckingPiece(Piece piece){
     @Override
     public boolean canMove(Square from, Square to) {
         Queen queen = new Queen();
+        queen.setChessModel(getChessModel());
+        queen.setPlayer(getPlayer());
 //        if (checkingPiece!=null&&checkingPiece.canMove(checkingPiece.getSquare(), to)){
 //            return false;
 //        }
+        if(getChessModel().getCheckingPiece()!=null&&getChessModel().getCheckingPiece()!=this){
+            if (queen.canMove(from, to)) {
+                int deltaCol = Math.abs(from.getCol() - to.getCol());
+                int deltaRow = Math.abs(from.getRow() - to.getRow());
+                if(deltaCol == 1 && deltaRow == 1 || deltaCol + deltaRow == 1){
+
+                    return
+                            (getChessModel().getCheckingPiece().getRow() == to.getRow() && getChessModel().getCheckingPiece().getCol() == to.getCol())||
+                                    ( !(getChessModel().getCheckingPiece().canMove(getChessModel().getCheckingPiece().getSquare(), to)));
+                }
+
+            }
+            else if (queen.canRookMove(from, to)||queen.canBishopMove(from, to)){
+                int deltaCol = Math.abs(from.getCol() - to.getCol());
+                int deltaRow = Math.abs(from.getRow() - to.getRow());
+                if(deltaCol == 1 && deltaRow == 1 || deltaCol + deltaRow == 1){
+                    return
+                            (getChessModel().getCheckingPiece().getRow() == to.getRow() && getChessModel().getCheckingPiece().getCol() == to.getCol())||
+                                    !(getChessModel().getCheckingPiece().canMove(getChessModel().getCheckingPiece().getSquare(), to))||
+                                    (getChessModel().getCheckingPiece().canMove(getChessModel().getCheckingPiece().getSquare(), from)&&!(getChessModel().getCheckingPiece().canMove(from, to)));
+                }
+            }
+        }
         if (queen.canMove(from, to)) {
             int deltaCol = Math.abs(from.getCol() - to.getCol());
             int deltaRow = Math.abs(from.getRow() - to.getRow());
@@ -51,7 +76,9 @@ public void setCheckingPiece(Piece piece){
             Piece piece = getChessModel().pieceAt(new Square(col, row));
             if(checkingPiece==null||
                     (checkingPiece!=null&&!checkingPiece.canMove(checkingPiece.getSquare(), new Square(col, row)))||
-                    (checkingPiece!=null&checkingPiece.getRow()==row&&checkingPiece.getCol()==col)) {
+                    (checkingPiece!=null&checkingPiece.getRow()==row&&checkingPiece.getCol()==col)||
+                    (getChessModel().getCheckingPiece()!=null&&(getChessModel().getCheckingPiece().canMove(getChessModel().getCheckingPiece().getSquare(), getSquare())&&
+                            !(getChessModel().getCheckingPiece().canMove(getSquare(), new Square(col, row)))))) {
                 if (piece == null && col <= 7) {
                     coord.add(new PointF(xCord + col * cellSize + cellSize / 2, yCoard + (7 - row) * cellSize + cellSize / 2));
                 } else if (piece.getPlayer() != getPlayer() && col <= 7) {
@@ -68,7 +95,8 @@ public void setCheckingPiece(Piece piece){
             }
             Piece piece = getChessModel().pieceAt(new Square(col, row));
             if(checkingPiece==null||(checkingPiece!=null&&!checkingPiece.canMove(checkingPiece.getSquare(), new Square(col, row))) ||
-                    (checkingPiece!=null&checkingPiece.getRow()==row&&checkingPiece.getCol()==col)) {
+                    (checkingPiece!=null&checkingPiece.getRow()==row&&checkingPiece.getCol()==col)&&
+                            !(getChessModel().getCheckingPiece().canMove(getSquare(), new Square(col, row)))) {
                 if (piece == null && row >= 0) {
                     coord.add(new PointF(xCord + col * cellSize + cellSize / 2, yCoard + (7 - row) * cellSize + cellSize / 2));
                 } else if (piece.getPlayer() != getPlayer() && row >= 0) {
@@ -84,7 +112,8 @@ row++;
             }
             Piece piece = getChessModel().pieceAt(new Square(col, row));
             if(checkingPiece==null||(checkingPiece!=null&&!checkingPiece.canMove(checkingPiece.getSquare(), new Square(col, row)))||
-                    (checkingPiece!=null&checkingPiece.getRow()==row&&checkingPiece.getCol()==col)) {
+                    (checkingPiece!=null&checkingPiece.getRow()==row&&checkingPiece.getCol()==col)&&
+                            !(getChessModel().getCheckingPiece().canMove(getSquare(), new Square(col, row)))) {
                 if (piece == null && col >= 0) {
                     coord.add(new PointF(xCord + col * cellSize + cellSize / 2, yCoard + (7 - row) * cellSize + cellSize / 2));
                 } else if (piece.getPlayer() != getPlayer() && col >= 0) {
@@ -99,7 +128,8 @@ row++;
             }
             Piece piece = getChessModel().pieceAt(new Square(col, row));
             if(checkingPiece==null||(checkingPiece!=null&&!checkingPiece.canMove(checkingPiece.getSquare(), new Square(col, row)))||
-                    (checkingPiece!=null&checkingPiece.getRow()==row&&checkingPiece.getCol()==col)) {
+                    (checkingPiece!=null&checkingPiece.getRow()==row&&checkingPiece.getCol()==col)&&
+                            !(getChessModel().getCheckingPiece().canMove(getSquare(), new Square(col, row)))) {
                 if (piece == null && row <= 7) {
                     coord.add(new PointF(xCord + col * cellSize + cellSize / 2, yCoard + (7 - row) * cellSize + cellSize / 2));
                 } else if (piece.getPlayer() != getPlayer() && row <= 7) {
@@ -107,6 +137,15 @@ row++;
 
                 }
             }
+        }
+
+        Piece piece = getChessModel().pieceAt(new Square(0, getRow()));
+        if(piece!=null&&piece.getMoveCount()==0&&getMoveCount()==0&&isClearHorizontallyBetween(getSquare(), piece.getSquare())){
+            coord.add(new PointF(xCord + (getCol()-2) * cellSize + cellSize / 2, yCoard + (7 - getRow()) * cellSize + cellSize / 2));
+        }
+        piece = getChessModel().pieceAt(new Square(7, getRow()));
+        if(piece!=null&&piece.getMoveCount()==0&&getMoveCount()==0&&isClearHorizontallyBetween(getSquare(), piece.getSquare())){
+            coord.add(new PointF(xCord + (getCol()+2) * cellSize + cellSize / 2, yCoard + (7 - getRow()) * cellSize + cellSize / 2));
         }
         return coord;
     }
@@ -121,8 +160,12 @@ row++;
                 break;
             }
             else{
-               if( piece != null&&piece.canMove(new Square(getCol(), getRow()), new Square(getCol(),nextRow))){
+               if( piece != null&&piece.canMove(new Square(getCol(),nextRow),new Square(getCol(), getRow()) )){
+                     getChessModel().setCheckingPiece(piece);
                    return true;
+               }
+               else if(piece!=null){
+                  break;
                }
             }
         }
@@ -134,10 +177,12 @@ row++;
                 break;
             }
             else{
-                if(piece != null&& piece.canMove(new Square(getCol(), getRow()), new Square(getCol(),nextRow))){
+                if(piece != null&& piece.canMove( new Square(getCol(),nextRow),new Square(getCol(), getRow()))){
                     checkingPiece =piece;
-                    ChessHistory.checkingPiece=piece;
+                      getChessModel().setCheckingPiece(piece);
                     return true;
+                }else if(piece!=null){
+                    break;
                 }
             }
         }
@@ -150,10 +195,12 @@ row++;
                 break;
             }
             else{
-                if(piece != null&& piece.canMove(new Square(getCol(), getRow()), new Square(nextCol,getRow()))){
+                if(piece != null&& piece.canMove(new Square(nextCol,getRow()),new Square(getCol(), getRow()) )){
                     checkingPiece =piece;
-                    ChessHistory.checkingPiece=piece;
+                      getChessModel().setCheckingPiece(piece);
                     return true;
+                }else if(piece!=null){
+                    break;
                 }
             }
         }
@@ -165,10 +212,12 @@ row++;
                 break;
             }
             else{
-                if(piece != null&& piece.canMove(new Square(getCol(), getRow()), new Square(nextCol,getRow()))){
+                if(piece != null&& piece.canMove(new Square(nextCol,getRow()),new Square(getCol(), getRow()) )){
                     checkingPiece =piece;
-                    ChessHistory.checkingPiece=piece;
+                      getChessModel().setCheckingPiece(piece);
                     return true;
+                }else if(piece!=null){
+                    break;
                 }
             }
         }
@@ -176,15 +225,20 @@ row++;
         for (int i = 1; i <= gap; i++) {
             int nextCol = getCol() + i ;
             int nextRow = getRow() + i ;
+            if(nextCol>7||nextRow>7){
+                break;
+            }
             Piece piece =getChessModel().pieceAt(new Square(nextCol, nextRow));
             if (piece != null&&piece.getPlayer()==getPlayer()) {
                 break;
             }
             else{
-                if(piece != null&& piece.canMove(new Square(getCol(), getRow()), new Square(nextCol,nextRow))){
+                if(piece != null&& piece.canMove(new Square(nextCol,nextRow),new Square(getCol(), getRow()) )){
                     checkingPiece =piece;
-                    ChessHistory.checkingPiece=piece;
+                      getChessModel().setCheckingPiece(piece);
                     return true;
+                }else if(piece!=null){
+                    break;
                 }
             }
         }
@@ -192,15 +246,20 @@ row++;
         for (int i = 1; i <= gap; i++) {
             int nextCol = getCol() + i ;
             int nextRow = getRow() - i ;
+            if(nextCol>7||nextRow<0){
+                break;
+            }
             Piece piece =getChessModel().pieceAt(new Square(nextCol, nextRow));
             if (piece != null&&piece.getPlayer()==getPlayer()) {
                 break;
             }
             else{
-                if(piece != null&& piece.canMove(new Square(getCol(), getRow()), new Square(nextCol,nextRow))){
+                if(piece != null&& piece.canMove(new Square(nextCol,nextRow),new Square(getCol(), getRow()))){
                     checkingPiece =piece;
-                    ChessHistory.checkingPiece=piece;
+                    getChessModel().setCheckingPiece(piece);
                     return true;
+                }else if(piece!=null){
+                    break;
                 }
             }
         }
@@ -208,15 +267,20 @@ row++;
         for (int i = 1; i <= gap; i++) {
             int nextCol = getCol() - i ;
             int nextRow = getRow() - i ;
+            if(nextCol<0||nextRow<0){
+                break;
+            }
             Piece piece =getChessModel().pieceAt(new Square(nextCol, nextRow));
             if (piece != null&&piece.getPlayer()==getPlayer()) {
                 break;
             }
             else{
-                if(piece != null&& piece.canMove(new Square(getCol(), getRow()), new Square(nextCol,nextRow))){
+                if(piece != null&& piece.canMove( new Square(nextCol,nextRow),new Square(getCol(), getRow()))){
                     checkingPiece =piece;
-                    ChessHistory.checkingPiece=piece;
+                      getChessModel().setCheckingPiece(piece);
                     return true;
+                }else if(piece!=null){
+                    break;
                 }
             }
         }
@@ -224,15 +288,20 @@ row++;
         for (int i = 1; i <= gap; i++) {
             int nextCol = getCol() - i ;
             int nextRow = getRow() + i ;
+            if(nextCol<0||nextRow>7){
+                break;
+            }
             Piece piece =getChessModel().pieceAt(new Square(nextCol, nextRow));
             if (piece != null&&piece.getPlayer()==getPlayer()) {
                 break;
             }
             else{
-                if(piece != null&& piece.canMove(new Square(getCol(), getRow()), new Square(nextCol,nextRow))){
+                if(piece != null&& piece.canMove( new Square(nextCol,nextRow),new Square(getCol(), getRow()))){
                     checkingPiece =piece;
-                    ChessHistory.checkingPiece=piece;
+                      getChessModel().setCheckingPiece(piece);
                     return true;
+                }else if(piece!=null){
+                    break;
                 }
             }
         }

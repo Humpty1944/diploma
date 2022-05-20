@@ -29,6 +29,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import chessModel.ChessHistoryStep;
@@ -130,7 +131,7 @@ public class OpeningsTableFragment extends Fragment implements SearchView.OnQuer
 
                 List<Opening> filteredValues = new ArrayList<Opening>(fileNames);
                 for (Opening value : fileNames) {
-                    if(!value.getName().toLowerCase().contains(newText.toLowerCase())&&!value.getNumber().toLowerCase().contains(newText.toLowerCase())){
+                    if(!value.getName().toLowerCase().contains(newText.toLowerCase())&&!value.getNumber().toLowerCase().contains(newText.toLowerCase())&&!checkSteps(value, newText.toLowerCase())){
                         filteredValues.remove(value);
                     }
 
@@ -147,6 +148,22 @@ public class OpeningsTableFragment extends Fragment implements SearchView.OnQuer
                                           }
                                       }
         );
+    }
+
+    private boolean checkSteps(Opening value, String newText){
+        List<String> steps =  new ArrayList<String>(Arrays.asList( value.getSteps().toLowerCase().split(" ")));
+        steps.removeAll(Arrays.asList("", null));
+        List<String> search =  new ArrayList<String>(Arrays.asList(newText.split(" ")));
+        search.removeAll(Arrays.asList("", null));
+        for(int i=0;i<search.size();i++){
+           if(steps.size()<=i){
+               return false;
+           }
+           if(!steps.get(i).equals(search.get(i))){
+               return false;
+           }
+       }
+       return true;
     }
 
     @Override

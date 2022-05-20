@@ -42,6 +42,7 @@ public class Opening {
         for (int i = 0; i < positions.length; i++) {
             before = 0;
             prevCol = -1;
+            Piece pieceBefore = null;
             for (int j = 0; j < positions[i].length(); j++) {
 
                 Player player = Player.WHITE;
@@ -67,11 +68,11 @@ public class Opening {
                     col += before - 1;
                 } else if ((i > 1 && i < 6) && before == 0) {
                     col = prevCol + 1;
-                } else if ((i > 1 && i < 6) && before > 1 && prevCol != -1) {
+                } else if ((i > 1 && i < 6) && before >= 1 && prevCol != -1) {
                     col = prevCol + before + 1;
                 } else if ((i > 1 && i < 6) && before > 0) {
                     col = before;
-                } else if ((i <= 1 || i >= 6) && col == prevCol) {
+                } else if ((i <= 1 || i >= 6) && col <= prevCol) {
                     col = prevCol + 1;
                 }
 //               if(i>1&&i<6) {
@@ -157,7 +158,7 @@ public class Opening {
             }
             listSquares.add(fromAlgebraToSquare(stepsArr[i]));
             if(step%2==1) {
-                listSquares.add(fromAlgebraToSquare(stepsArr[i]));
+              //  listSquares.add(fromAlgebraToSquare(stepsArr[i]));
                 newSteps+=currNum+". "+stepsArr[i]+" ";
                 currNum++;
             }else{

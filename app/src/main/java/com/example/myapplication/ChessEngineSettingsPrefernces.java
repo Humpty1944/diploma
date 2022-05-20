@@ -8,8 +8,11 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.text.InputFilter;
+import android.text.InputType;
 import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -22,6 +25,7 @@ import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentContainerView;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.preference.EditTextPreference;
 import androidx.preference.ListPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
@@ -39,6 +43,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -46,57 +51,42 @@ import chessModel.ChessModel;
 import engine.work.EngineOptions;
 import engine.work.UCIEngine;
 import engine.work.UCIEngineBase;
+import helpClass.InputFilterMinMax;
 import helpClass.TinyDB;
 
-public class ChessEngineSettingsPrefernces  extends PreferenceFragmentCompat {
+public class ChessEngineSettingsPrefernces extends PreferenceFragmentCompat {
     ActivityResultLauncher<String> mGetContent;
-    String depth="20";
+    String depth = "20";
     private static String engineLogDir = "DroidFish/uci/logs";
     private EngineOptions engineOptions = new EngineOptions();
     UCIEngine uciEngine;
     ChessEngineSettingsFragment chessAnalysisFragment;
-    public  ChessEngineSettingsPrefernces(ChessEngineSettingsFragment fragment){
-        chessAnalysisFragment=fragment;
+    ListPreference refreshPref;
+
+    EditTextPreference hashType;
+    EditTextPreference multiPv;
+    EditTextPreference treadsCount;
+    EditTextPreference depthPref;
+   // EditTextPreference multiPvFirstNumber;
+
+    public ChessEngineSettingsPrefernces(ChessEngineSettingsFragment fragment) {
+        chessAnalysisFragment = fragment;
     }
-    public  ChessEngineSettingsPrefernces(){
-        chessAnalysisFragment=null;
+
+    public ChessEngineSettingsPrefernces() {
+        chessAnalysisFragment = null;
     }
+
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         addPreferencesFromResource(R.xml.engine_settings);
-        ListPreference refreshPref = (ListPreference) findPreference("engineList");
-        AssetManager assetManager = getActivity().getAssets();
-
-        try {
-            TinyDB tinyDB = new TinyDB(getContext());
-            ArrayList<String> names = tinyDB.getListString("externalEngine");
-            ArrayList<String> namesOnly =new  ArrayList<>();
-            for (int i=0;i<names.size();i++){
-                if(!names.get(i).equals("")||names.get(i).equals(" ")) {
-                    int len = names.get(i).split("/").length;
-                    namesOnly.add(names.get(i).split("/")[len - 1]);
-                }
-            }
-
-            String[] list = assetManager.list("arm64-v8a");
-            //namesOnly.addAll(Arrays.asList(list));
-            String[] res =new String[list.length+namesOnly.size()];
-            for(int i=0;i<list.length;i++){
-                res[i]=list[i];
-            }
-            int j=0;
-            for(int i=list.length;i<res.length;i++){
-                res[i]=namesOnly.get(j);
-                j++;
-            }
-            System.out.println("fdgdfgfdgfd");
-            refreshPref.setEntries(res);
-            refreshPref.setEntryValues(res);
-            //refreshPref.setDefaultValue(res[res.length-1]);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        refreshPref = (ListPreference) findPreference("engineList");
+        hashType = findPreference("hashType");
+        multiPv = findPreference("multiPv");
+        treadsCount = findPreference("treadsCount");
+        depthPref  =findPreference("depth");
+//        multiPvFirstNumber = findPreference("multiPvFirstNumber");
 
     }
 
@@ -107,16 +97,50 @@ public class ChessEngineSettingsPrefernces  extends PreferenceFragmentCompat {
 
     }
 
+    public void updateListOfEngine() {
+        AssetManager assetManager = getActivity().getAssets();
+
+        try {
+            TinyDB tinyDB = new TinyDB(getContext());
+            ArrayList<String> names = tinyDB.getListString("externalEngine");
+            ArrayList<String> namesOnly = new ArrayList<>();
+            for (int i = 0; i < names.size(); i++) {
+                if (!names.get(i).equals("") || names.get(i).equals(" ")) {
+                    int len = names.get(i).split("/").length;
+                    namesOnly.add(names.get(i).split("/")[len - 1]);
+                }
+            }
+
+            String[] list = assetManager.list("arm64-v8a");
+            //namesOnly.addAll(Arrays.asList(list));
+            String[] res = new String[list.length + namesOnly.size()];
+            for (int i = 0; i < list.length; i++) {
+                res[i] = list[i];
+            }
+            int j = 0;
+            for (int i = list.length; i < res.length; i++) {
+                res[i] = namesOnly.get(j);
+                j++;
+            }
+
+            refreshPref.setEntries(res);
+            refreshPref.setEntryValues(res);
+            //refreshPref.setDefaultValue(res[res.length-1]);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        ListPreference refreshPref = (ListPreference) findPreference("engineList");
+       // ListPreference refreshPref = (ListPreference) findPreference("engineList");
         Preference chooseEngine = findPreference("newEngine");
         AssetManager assetManager = getActivity().getAssets();
         ProgressBar progressBar = chessAnalysisFragment.view.findViewById(R.id.SHOW_PROGRESS);
         FragmentContainerView fragmentContainerView = chessAnalysisFragment.view.findViewById(R.id.settings_container);
         final String[] pathHelp = {""};
-        mGetContent=registerForActivityResult(new ActivityResultContracts.GetContent(),
+        mGetContent = registerForActivityResult(new ActivityResultContracts.GetContent(),
 
                 new ActivityResultCallback<Uri>() {
                     @Override
@@ -127,9 +151,9 @@ public class ChessEngineSettingsPrefernces  extends PreferenceFragmentCompat {
                                 String path = createCopyAndReturnRealPath(getContext(), result);
                                 try {
                                     checkConnection(path);
-                                    pathHelp[0] =path;
-                                }catch (Exception e){
-                                    pathHelp[0]="1";
+                                    pathHelp[0] = path;
+                                } catch (Exception e) {
+                                    pathHelp[0] = "1";
                                     Thread.currentThread().interrupt();
 
                                 }
@@ -141,18 +165,19 @@ public class ChessEngineSettingsPrefernces  extends PreferenceFragmentCompat {
                         progressBar.setVisibility(View.VISIBLE);
                         fragmentContainerView.setVisibility(View.GONE);
                         try {
-                        startupThread.start();
+                            startupThread.start();
 
                             startupThread.join();
-                            if(pathHelp[0]=="1"){
-                                Toast.makeText(getContext(),"Данный объект не может работать на данном устройстве", Toast.LENGTH_LONG).show();
+                            if (pathHelp[0] == "1") {
+                                Toast.makeText(getContext(), "Данный объект не может работать на данном устройстве", Toast.LENGTH_LONG).show();
 
-                            }else{
-                                Toast.makeText(getContext(),"Загрузка завершена", Toast.LENGTH_LONG).show();
+                            } else {
+                                Toast.makeText(getContext(), "Загрузка завершена", Toast.LENGTH_LONG).show();
                                 TinyDB tinydb = new TinyDB(getContext());
                                 ArrayList<String> paths = tinydb.getListString("externalEngine");
                                 paths.add(pathHelp[0]);
                                 tinydb.putListString("externalEngine", paths);
+                                updateListOfEngine();
                             }
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -164,33 +189,9 @@ public class ChessEngineSettingsPrefernces  extends PreferenceFragmentCompat {
 
                     }
                 });
-        try {
-            TinyDB tinyDB = new TinyDB(getContext());
-            ArrayList<String> names = tinyDB.getListString("externalEngine");
-            ArrayList<String> namesOnly =new  ArrayList<>();
-            for (int i=0;i<names.size();i++){
-                if(!names.get(i).equals("")||names.get(i).equals(" ")) {
-                    int len = names.get(i).split("/").length;
-                    namesOnly.add(names.get(i).split("/")[len - 1]);
-                }
-            }
+        updateListOfEngine();
 
-            String[] list = assetManager.list("arm64-v8a");
-            //namesOnly.addAll(Arrays.asList(list));
-            String[] res =new String[list.length+namesOnly.size()];
-            for(int i=0;i<list.length;i++){
-                res[i]=list[i];
-            }
-            int j=0;
-            for(int i=list.length;i<res.length;i++){
-                res[i]=namesOnly.get(j);
-                j++;
-            }
-            System.out.println("fdgdfgfdgfd");
-            refreshPref.setEntries(res);
-            refreshPref.setEntryValues(res);
-//            CharSequence[] list = assetManager.list("arm64-v8a");
-//            refreshPref.setEntries(list);
+        setConstrainsToPreferences();
             chooseEngine.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                 public boolean onPreferenceClick(Preference preference) {
 
@@ -199,14 +200,72 @@ public class ChessEngineSettingsPrefernces  extends PreferenceFragmentCompat {
                     return true;
                 }
             });
+//        refreshPref.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+//                @Override
+//                public boolean onPreferenceChange(Preference preference, Object newValue) {
+//                    String newVal = String.valueOf(newValue).toLowerCase();
+//                    if(newVal.contains("stockfish")||newVal.contains("ethereal")){
+//                        multiPvFirstNumber.setText("0");
+//                    }
+//                    else{
+//                        multiPvFirstNumber.setText("1");
+//                    }
+//                    return true;
+//                }
+//            });
 
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
 
     }
+private void setConstrainsToPreferences(){
+    depthPref.setOnBindEditTextListener(new androidx.preference.EditTextPreference.OnBindEditTextListener() {
+        @Override
+        public void onBindEditText(@NonNull EditText editText) {
+            editText.setFilters(new InputFilter[]{new InputFilterMinMax("1", "35")});
+            editText.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_SIGNED);
+
+        }
+    });
+
+
+        hashType.setOnBindEditTextListener(new androidx.preference.EditTextPreference.OnBindEditTextListener() {
+            @Override
+            public void onBindEditText(@NonNull EditText editText) {
+                editText.setFilters(new InputFilter[]{new InputFilterMinMax("1", "100000")});
+                editText.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_SIGNED);
+
+            }
+        });
+
+        multiPv.setOnBindEditTextListener(new androidx.preference.EditTextPreference.OnBindEditTextListener() {
+            @Override
+            public void onBindEditText(@NonNull EditText editText) {
+                editText.setFilters(new InputFilter[]{new InputFilterMinMax("1", "3")});
+                editText.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_SIGNED);
+
+            }
+        });
+        treadsCount.setOnBindEditTextListener(new androidx.preference.EditTextPreference.OnBindEditTextListener() {
+            @Override
+            public void onBindEditText(@NonNull EditText editText) {
+                editText.setFilters(new InputFilter[]{new InputFilterMinMax("1", "64")});
+                editText.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_SIGNED);
+
+            }
+        });
+//    multiPvFirstNumber.setOnBindEditTextListener(new androidx.preference.EditTextPreference.OnBindEditTextListener() {
+//        @Override
+//        public void onBindEditText(@NonNull EditText editText) {
+//            editText.setFilters(new InputFilter[]{new InputFilterMinMax("0", "100000")});
+//            editText.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_SIGNED);
+//
+//        }
+//    });
+}
     @Nullable
-    public synchronized  String createCopyAndReturnRealPath(
+    public synchronized String createCopyAndReturnRealPath(
             @NonNull Context context, @NonNull Uri uri) {
         final ContentResolver contentResolver = context.getContentResolver();
         if (contentResolver == null)
@@ -231,13 +290,14 @@ public class ChessEngineSettingsPrefernces  extends PreferenceFragmentCompat {
         }
         return file.getAbsolutePath();
     }
-    private synchronized void  checkConnection(String mString) throws Exception {
-       // String mString = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext()).getString("engineList", "");
-        depth =  PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext()).getString("depth", "20");
-        if (mString.equals( "")||mString.equals("1")||mString.equals("0")) {
+
+    private synchronized void checkConnection(String mString) throws Exception {
+        // String mString = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext()).getString("engineList", "");
+        depth = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext()).getString("depth", "20");
+        if (mString.equals("") || mString.equals("1") || mString.equals("0")) {
             mString = "stockfish";
         }
-       // Toast.makeText(getActivity().getApplicationContext(), "Текущий движок "+mString, Toast.LENGTH_LONG).show();
+        // Toast.makeText(getActivity().getApplicationContext(), "Текущий движок "+mString, Toast.LENGTH_LONG).show();
 //        UCIEngine uciEngine = null;
         String sep = File.separator;
         engineOptions.workDir = getContext().getExternalFilesDir(null) + sep + engineLogDir;
@@ -260,12 +320,12 @@ public class ChessEngineSettingsPrefernces  extends PreferenceFragmentCompat {
         uciEngine.clearOptions();
         uciEngine.writeLineToEngine("uci");
         String lineInfo = "1";
-        int count=0;
-        while ((lineInfo != null & !lineInfo.equals("uciok"))&&count<15) {
+        int count = 0;
+        while ((lineInfo != null & !lineInfo.equals("uciok")) && count < 15) {
             lineInfo = uci.readLineFromEngine(50);
             count++;
         }
-        if(count>=15){
+        if (count >= 15) {
             throw new Exception();
         }
         uciEngine.writeLineToEngine("quit");

@@ -13,6 +13,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
+import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -43,10 +44,11 @@ import chessModel.ChessModel;
 import chessModel.Player;
 import chessModel.Square;
 import chessPiece.Piece;
+//import engine.EngineUtil;
 import engine.EngineUtil;
-import engine.UciHelper;
+//import engine.UciHelper;
 import engine.work.EngineOptions;
-import engine.work.SearchListener;
+//import engine.work.SearchListener;
 import engine.work.UCIEngine;
 import engine.work.UCIEngineBase;
 import interfaces.ChessHistoryInterfaceCallbacks;
@@ -56,12 +58,13 @@ import openings.OpeningsManager;
 import pgn.PgnManager;
 import views.ChessBoardView;
 import views.ChessHistoryAdapter;
+import views.DownloadOptionsView;
+import views.FenView;
 import views.PromotionView;
 
 import androidx.core.content.FileProvider;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.preference.PreferenceManager;
@@ -74,13 +77,45 @@ import com.google.android.material.navigation.NavigationView;
 
 //import com.example.myapplication.databinding.ActivityMainBinding;
 
-public class MainActivity extends AppCompatActivity implements ChessInterface, ChessAnalysisFragment.OnDataPass {
-    SearchListener listener;
+public class MainActivity extends AppCompatActivity implements ChessInterface, ChessAnalysisFragment.OnDataPass,
+        DownloadOptionsView.ChooseOptionListener, FenView.FenDialogListener {
+   // SearchListener listener;
     ChessModel chessModel = new ChessModel();
     private List<ChessHistoryStep> chessHistory = new ArrayList<>();
+//    @Override
+//    public void onDataPass(List<ChessHistoryStep> data) {
+//        chessHistory=data;
+//    }
+@Override
+public void onDataPass(ChessModel data) {
+    chessHistory=data.getChessHistorySteps();
+    this.chessModel=data;
+}
+
     @Override
-    public void onDataPass(List<ChessHistoryStep> data) {
-        chessHistory=data;
+    public void onDialogOptionClick(int which) {
+        if (which==0){
+            mGetContent.launch("application/x-chess-pgn");
+        }
+        else{
+            FenView fenView = new FenView();
+            fenView.show(getSupportFragmentManager(), "fenload");
+        }
+    }
+
+    @Override
+    public void onDialogFenData(String fen) {
+        getSupportActionBar().setTitle("Анализ");
+        Bundle bundle = new Bundle();
+        bundle.putBoolean("load", false);
+
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        // ChessAnalysisFragment chessAnalysisFragment = new ChessAnalysisFragment();
+        ChessAnalysisFragment chessAnalysisFragment = new ChessAnalysisFragment(openingsList, fen);
+        chessAnalysisFragment.setArguments(bundle);
+        ft.replace(R.id.your_placeholder, chessAnalysisFragment);
+
+        ft.commit();
     }
 
 
@@ -136,6 +171,7 @@ public class MainActivity extends AppCompatActivity implements ChessInterface, C
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
          pgnManager = new PgnManager(this);
          openingsManager = new OpeningsManager(this);
         frameLayout = (FrameLayout)findViewById(R.id.your_placeholder);
@@ -143,7 +179,8 @@ public class MainActivity extends AppCompatActivity implements ChessInterface, C
         navView = (NavigationView)findViewById(R.id.navView);
         context =this.getApplicationContext();
         openingsList = openingsManager.readFiles();
-        permissionCamera();
+      //  permissionCamera();
+        getSupportActionBar().setTitle("Анализ");
         mGetContent=registerForActivityResult(new ActivityResultContracts.GetContent(),
                 new ActivityResultCallback<Uri>() {
                     @Override
@@ -156,30 +193,16 @@ public class MainActivity extends AppCompatActivity implements ChessInterface, C
                         Bundle bundle = new Bundle();
                         bundle.putBoolean("load", true);
                         chessAnalysisFragment.setArguments(bundle);
-                        ft.replace(R.id.your_placeholder, chessAnalysisFragment);
-                        frameLayout.setElevation(5);
+                        List<Fragment> fragmentList = getFragmentManager().getFragments();
+                       // getFragmentManager().getFragments().set(fragmentList.size()-1, null);
+
+                        ft.replace(R.id.your_placeholder, chessAnalysisFragment, "chessLoadExternal");
+                       // frameLayout.setElevation(5);
                         ft.commit();
                        // Toast.makeText(context, (CharSequence) result,Toast.LENGTH_LONG).show();
                     }
                 });
 
-        mGetPhoto = registerForActivityResult(new ActivityResultContracts.TakePicture(), new ActivityResultCallback<Boolean>() {
-                    @Override
-                    public void onActivityResult(Boolean result) {
-                        if(result){
-                            Toast.makeText(getContext(), "hahahaha", Toast.LENGTH_LONG).show();
-                        }
-                    }
-                });
-            mPhoto=registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
-                @Override
-                public void onActivityResult(ActivityResult result) {
-                    if(result.getResultCode()==RESULT_OK&&result.getData()!=null){
-                        Toast.makeText(getContext(), "hahahaha", Toast.LENGTH_LONG).show();
-
-                    }
-                }
-            });
                 createDirectories();
 //        engineList
        // String mString = PreferenceManager.getDefaultSharedPreferences(this).getString("engineList", "0"); //getBoolean will return defaultValue is key isn't found
@@ -198,63 +221,68 @@ public class MainActivity extends AppCompatActivity implements ChessInterface, C
         navView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                System.out.println(item.getItemId());
+
 
                 if(item.getItemId()==R.id.plays){
+                    List<Fragment> fragmentList = getFragmentManager().getFragments();
                     FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-                    ft.replace(R.id.your_placeholder, new PlaysTable());
+                    getSupportActionBar().setTitle("Партии");
+                    ft.replace(R.id.your_placeholder, new PlaysTable(), "plays");
                     //frameLayout.setElevation(5);
                     ft.commit();
 
                 }else if(item.getItemId()==R.id.analysis){
-                    Bundle bundle = new Bundle();
-                    bundle.putBoolean("load", false);
+                    try {
+                        getSupportActionBar().setTitle("Анализ");
+                        Bundle bundle = new Bundle();
+                        bundle.putBoolean("load", false);
 
-                    FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-                   // ChessAnalysisFragment chessAnalysisFragment = new ChessAnalysisFragment();
-                    ChessAnalysisFragment chessAnalysisFragment = new ChessAnalysisFragment(openingsList);
-                    chessAnalysisFragment.setArguments(bundle);
-                    ft.replace(R.id.your_placeholder, chessAnalysisFragment);
+                        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                        // ChessAnalysisFragment chessAnalysisFragment = new ChessAnalysisFragment();
+                        ChessAnalysisFragment chessAnalysisFragment = new ChessAnalysisFragment(openingsList);
+                        chessAnalysisFragment.setArguments(bundle);
+                        ft.replace(R.id.your_placeholder, chessAnalysisFragment, "analysis");
 
-                    ft.commit();
+                        ft.commit();
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
 
                 }else if(item.getItemId()==R.id.openings){
+                    getSupportActionBar().setTitle("Дебюты");
                     FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-                    ft.replace(R.id.your_placeholder, new OpeningsTableFragment());
+                    ft.replace(R.id.your_placeholder, new OpeningsTableFragment(), "opening");
 
                     ft.commit();
                 }else if(item.getItemId()==R.id.upload) {
                    // FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
                     //ft.replace(R.id.your_placeholder, new PlaysTable());
-                    pgnManager.saveGame((ArrayList<ChessHistoryStep>) chessHistory);
+                    if(chessHistory.size()==0){
+                        Toast.makeText(getContext(), "Данные о текущей игре отсутсвуют", Toast.LENGTH_LONG).show();
+                    }else {
+                        pgnManager.saveGame((ArrayList<ChessHistoryStep>) chessHistory, chessModel.getFen());
+                    }
                    // frameLayout.setElevation(5);
                    // ft.commit();
                 }else if(item.getItemId()==R.id.download){
-                    mGetContent.launch("application/x-chess-pgn");
+                    DownloadOptionsView optionsView = new DownloadOptionsView();
+                    optionsView.show(getSupportFragmentManager(), "options");
+                   // mGetContent.launch("application/x-chess-pgn");
                 }
                 else if (item.getItemId()==R.id.engine){
+                    getSupportActionBar().setTitle("Настройки");
                     FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-                    ft.replace(R.id.your_placeholder, new ChessEngineSettingsFragment());
+                    ft.replace(R.id.your_placeholder, new ChessEngineSettingsFragment(), "settingEngine");
+
+                    ft.commit();
+                }else if(item.getItemId()==R.id.boardEditor){
+                    getSupportActionBar().setTitle("Редактор доски");
+                    FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                    ft.replace(R.id.your_placeholder, new ChessCreateBoardFragment(), "createBoard");
 
                     ft.commit();
                 }
-                else if (item.getItemId()==R.id.photoMaker){
 
-                    Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                    if(intent.resolveActivity(getPackageManager())!=null){
-                        mPhoto.launch(intent);
-                    }
-//                    Uri imageUri = null;
-//                    try {
-//                        imageUri = FileProvider.getUriForFile(getContext(), "com.example.myapplication.fileprovider", createImageFile());
-//                    } catch (IOException e) {
-//                        e.printStackTrace();
-//                    }
-//
-//                    mGetPhoto.launch(imageUri);
-
-                }
-               // DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
                 drawerLayout.closeDrawer(GravityCompat.START);
                 return true;
             }
@@ -262,29 +290,46 @@ public class MainActivity extends AppCompatActivity implements ChessInterface, C
 
     }
 
-    public void permissionCamera(){
-        if (cameraPermission == PermissionState.UNKNOWN) {
-            String extStorage = Manifest.permission.CAMERA;
-            if (ContextCompat.checkSelfPermission(this, extStorage) ==
-                    PackageManager.PERMISSION_GRANTED) {
-                cameraPermission = PermissionState.GRANTED;
-            } else {
-                cameraPermission = PermissionState.REQUESTED;
-                ActivityCompat.requestPermissions(this, new String[]{extStorage}, 0);
-            }
-        }
+    public void replaceFragment(Fragment fragment, Bundle bundle) {
+
     }
-public File createImageFile() throws IOException {
-    File strDir = Environment.getExternalStorageDirectory();
-    return File.createTempFile("temp_image", ".png",strDir);
-}
-//    public void setListOpenings(List<Opening> openings){
-//       chessModel.setOpenings(openings);
-//    }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
     }
+
+   public void changeFragments(Object... objects){
+       try {
+           MasterPlays plays;
+
+           String folderName = (String) objects[0];
+
+           plays = new MasterPlays(folderName);
+
+           FragmentManager fragmentManager = getSupportFragmentManager();
+           fragmentManager.beginTransaction().replace(R.id.your_placeholder, plays, "masterPlays")
+                   .commit();
+       }catch (Exception e){  e.printStackTrace();}
+
+
+   }
+
+   public void changeToPlay(Set<Piece> pieces){
+       Player currPlayer = ChessHistory.currPlayer;
+       ChessModel model = new ChessModel();
+       model.setPieceBox(pieces);
+       model.setCurrPlayer(currPlayer);
+       ChessHistory.currPlayer = currPlayer;
+       if(currPlayer==Player.BLACK){
+           model.setChessHistorySteps(new ChessHistoryStep());
+       }
+       ChessAnalysisFragment chessAnalysisFragment = new ChessAnalysisFragment(model, openingsList);
+       FragmentManager fragmentManager = getSupportFragmentManager();
+       fragmentManager.beginTransaction().replace(R.id.your_placeholder, chessAnalysisFragment, "chesAnalysisLoadFen")
+               .commit();
+   }
+
     public void changeFragment(byte fragmentType, ChessModel model, Opening opening){
        if(fragmentType==0){
            Bundle bundle = new Bundle();
@@ -294,49 +339,21 @@ public File createImageFile() throws IOException {
           // ChessAnalysisFragment chessAnalysisFragment = new ChessAnalysisFragment(model);
            ChessAnalysisFragment chessAnalysisFragment = new ChessAnalysisFragment(model,openingsList);
            chessAnalysisFragment.setArguments(bundle);
-           ft.replace(R.id.your_placeholder, chessAnalysisFragment);
+           ft.replace(R.id.your_placeholder, chessAnalysisFragment,"chesAnalysisLoad");
 
            ft.commit();
        }
        else if (fragmentType==1){
            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
            ChessOpeningFragment chessAnalysisFragment = new ChessOpeningFragment(opening);
-           ft.replace(R.id.your_placeholder, chessAnalysisFragment);
+
+           ft.replace(R.id.your_placeholder, chessAnalysisFragment,"openingDetail");
 
            ft.commit();
 
        }
     }
-//    private void monitorLoop(UCIEngine uci) {
-//        while (true) {
-//            int timeout = getReadTimeout();
-//            if (Thread.currentThread().isInterrupted())
-//                return;
-//            String s = uci.readLineFromEngine(timeout);
-//            long t0 = System.currentTimeMillis();
-//            while (s != null && !s.isEmpty()) {
-//                if (Thread.currentThread().isInterrupted())
-//                    return;
-//              //  processEngineOutput(uci, s);
-//                s = uci.readLineFromEngine(1);
-//                long t1 = System.currentTimeMillis();
-//                if (t1 - t0 >= 1000)
-//                    break;
-//            }
-//            if ((s == null) || Thread.currentThread().isInterrupted())
-//                return;
-//           // processEngineOutput(uci, s);
-//            if (Thread.currentThread().isInterrupted())
-//                return;
-//          //  notifyGUI();
-//            if (Thread.currentThread().isInterrupted())
-//                return;
-//        }
-//    }
-//    private synchronized int getReadTimeout() {
-//
-//        return 10000;
-//    }
+
     private void createDirectories() {
         if (storagePermission == PermissionState.UNKNOWN) {
             String extStorage = Manifest.permission.WRITE_EXTERNAL_STORAGE;
@@ -387,7 +404,7 @@ public File createImageFile() throws IOException {
 
     @Override
     public void promotionView(Player player,Piece piece) {
-        System.out.println("view");
+
         view.setPlayer(player);
         view.setCurrPiece(piece);
         layout.addView(view, lParams);
@@ -395,7 +412,7 @@ public File createImageFile() throws IOException {
 
     @Override
     public void promotePawn(ChessMan chessMan, Piece piece) {
-        System.out.println("pawn");
+
         if (chessMan==null||piece==null){
             view.setVisibility(View.GONE);
         }else {
@@ -424,8 +441,7 @@ public File createImageFile() throws IOException {
     @RequiresApi(api = Build.VERSION_CODES.R)
     @Override
     public void backMovePiece(ChessHistoryStep move) {
-        System.out.println(chessHistory.indexOf(move));
-        System.out.println("size"+chessHistory.size());
+
         for(int i=chessHistory.size()-1;i>chessHistory.indexOf(move);i--){
             chessModel.backMovePiece(chessHistory.get(i));
         }
@@ -439,17 +455,22 @@ public File createImageFile() throws IOException {
     }
 
     @Override
-    public void sendAndDisplayAnalysis(ChessHistoryStep step) {
+    public void sendAndDisplayAnalysis(int block) {
+
+    }
+
+    @Override
+    public void updatePromotion(ChessHistoryStep step) {
 
     }
 
 
-    public synchronized void  updateText(String textData){
-      HashMap<String,String> res =  UciHelper.getInfoResult(textData);
-      if (res.size()>1) {
-          text.setText(textData);
-      }
-    }
+//    public synchronized void  updateText(String textData){
+//      HashMap<String,String> res =  UciHelper.getInfoResult(textData);
+//      if (res.size()>1) {
+//          text.setText(textData);
+//      }
+//    }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {

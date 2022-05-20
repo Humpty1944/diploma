@@ -159,23 +159,23 @@ public class UCIOptions implements Serializable, Cloneable {
         }
     }
 
-    public static final class ButtonOption extends OptionBase {
-        private static final long serialVersionUID = 1L;
-        public boolean trigger;
-        ButtonOption(String name) {
-            this.name = name;
-            this.type = Type.BUTTON;
-            this.trigger = false;
-        }
-        @Override
-        public boolean modified() {
-            return false;
-        }
-        @Override
-        public String getStringValue() {
-            return "";
-        }
-    }
+//    public static final class ButtonOption extends OptionBase {
+//        private static final long serialVersionUID = 1L;
+//        public boolean trigger;
+//        ButtonOption(String name) {
+//            this.name = name;
+//            this.type = Type.BUTTON;
+//            this.trigger = false;
+//        }
+//        @Override
+//        public boolean modified() {
+//            return false;
+//        }
+//        @Override
+//        public String getStringValue() {
+//            return "";
+//        }
+//    }
 
     public static final class StringOption extends OptionBase {
         private static final long serialVersionUID = 1L;
@@ -240,9 +240,9 @@ public class UCIOptions implements Serializable, Cloneable {
         return options.get(name.toLowerCase(Locale.US));
     }
 
-    final void addOption(OptionBase p) {
-        String name = p.name.toLowerCase(Locale.US);
-        names.add(name);
-        options.put(name, p);
-    }
+//    final void addOption(OptionBase p) {
+//        String name = p.name.toLowerCase(Locale.US);
+//        names.add(name);
+//        options.put(name, p);
+//    }
 }

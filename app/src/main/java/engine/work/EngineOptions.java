@@ -29,34 +29,34 @@ public final class EngineOptions {
         workDir = "";
     }
 
-    public EngineOptions(EngineOptions other) {
-        hashMB = other.hashMB;
-        unSafeHash = other.unSafeHash;
-        hints = other.hints;
-        hintsEdit = other.hintsEdit;
-        rootProbe = other.rootProbe;
-        engineProbe = other.engineProbe;
-        gtbPath = other.gtbPath;
-        gtbPathNet = other.gtbPathNet;
-        rtbPath = other.rtbPath;
-        rtbPathNet = other.rtbPathNet;
-        networkID = other.networkID;
-        workDir = other.workDir;
-    }
+//    public EngineOptions(EngineOptions other) {
+//        hashMB = other.hashMB;
+//        unSafeHash = other.unSafeHash;
+//        hints = other.hints;
+//        hintsEdit = other.hintsEdit;
+//        rootProbe = other.rootProbe;
+//        engineProbe = other.engineProbe;
+//        gtbPath = other.gtbPath;
+//        gtbPathNet = other.gtbPathNet;
+//        rtbPath = other.rtbPath;
+//        rtbPathNet = other.rtbPathNet;
+//        networkID = other.networkID;
+//        workDir = other.workDir;
+//    }
 
     /** Get the GTB path for an engine. */
-    public String getEngineGtbPath(boolean networkEngine) {
-        if (!engineProbe)
-            return "";
-        return networkEngine ? gtbPathNet : gtbPath;
-    }
-
-    /** Get the RTB path for an engine. */
-    public String getEngineRtbPath(boolean networkEngine) {
-        if (!engineProbe)
-            return "";
-        return networkEngine ? rtbPathNet : rtbPath;
-    }
+//    public String getEngineGtbPath(boolean networkEngine) {
+//        if (!engineProbe)
+//            return "";
+//        return networkEngine ? gtbPathNet : gtbPath;
+//    }
+//
+//    /** Get the RTB path for an engine. */
+//    public String getEngineRtbPath(boolean networkEngine) {
+//        if (!engineProbe)
+//            return "";
+//        return networkEngine ? rtbPathNet : rtbPath;
+//    }
 
     @Override
     public boolean equals(Object o) {

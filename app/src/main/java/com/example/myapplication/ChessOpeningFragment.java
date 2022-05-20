@@ -123,11 +123,14 @@ public class ChessOpeningFragment extends Fragment implements ChessInterface {
     }
 
     @Override
-    public void sendAndDisplayAnalysis(ChessHistoryStep step) {
+    public void sendAndDisplayAnalysis(int block) {
 
     }
 
+    @Override
+    public void updatePromotion(ChessHistoryStep step) {
 
+    }
 
 
 }

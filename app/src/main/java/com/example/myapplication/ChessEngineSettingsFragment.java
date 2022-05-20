@@ -18,7 +18,7 @@ import chessModel.ChessHistory;
 import chessModel.ChessModel;
 import openings.Opening;
 
-public class ChessEngineSettingsFragment extends Fragment
+public class  ChessEngineSettingsFragment extends Fragment
 {
 
 
@@ -31,6 +31,13 @@ public class ChessEngineSettingsFragment extends Fragment
                 .commit();
         return view;
     }
+//    public void changePreferences(){
+//        getActivity().getSupportFragmentManager()
+//                .beginTransaction().addToBackStack("DetailSetting")
+//                .replace(R.id.settings_container, new ChessEngineDetailsPreferences())
+//                .commit();
+//
+//    }
 
 //    public ChessOpeningFragment() {
 //        super(R.layout.chess_opening);

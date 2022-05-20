@@ -56,12 +56,27 @@ public class Rook extends Piece {
 
     @Override
     public boolean canMove(Square from, Square to) {
-        if (from.getCol() == to.getCol() && isClearVerticallyBetween(from, to) ||
-                from.getRow() == to.getRow() && isClearHorizontallyBetween(from, to)) {
 
-            return true;
+      //  if(getChessModel().getCheckingPiece()!=null&&getChessModel().getCheckingPiece()!=this){
+        if(getChessModel().getCheckingPiece()!=null&&getChessModel().getCheckingPiece()!=this){
+            if( (from.getCol() == to.getCol() && isClearVerticallyBetween(from, to) ||
+                    from.getRow() == to.getRow() && isClearHorizontallyBetween(from, to))) {
+
+
+                return (getChessModel().getCheckingPiece().canMove(getChessModel().getCheckingPiece().getSquare(), to) &&
+                        getChessModel().getCheckingPiece().canMove(to,getChessModel().getCheckPiece().getSquare())) ||
+                        (getChessModel().getCheckingPiece().getRow() == to.getRow() && getChessModel().getCheckingPiece().getCol() == to.getCol());
+            }
+
+
         }
-        return false;
+
+       return  (from.getCol() == to.getCol() && isClearVerticallyBetween(from, to) ||
+                from.getRow() == to.getRow() && isClearHorizontallyBetween(from, to)) ;
+//
+//            return true;
+//        }
+//        return false;
 
     }
 
@@ -74,14 +89,15 @@ public class Rook extends Piece {
                 continue;
             }
             Piece piece = getChessModel().pieceAt(new Square(getCol(), i));
-            if(ChessHistory.checkingPiece.getCol()==getCol()&&ChessHistory.checkingPiece.getRow()==i){
+            if(getChessModel().getCheckingPiece().getCol()==getCol()&&getChessModel().getCheckingPiece().getRow()==i){
                 coord.add(new PointF(xCord + getCol() * cellSize + cellSize / 2, yCoard + (7 - i) * cellSize + cellSize / 2));
-                return coord;
+               // return coord;
             }
-            if( ChessHistory.checkingPiece.canMove(ChessHistory.checkingPiece.getSquare(),new Square(getCol(), i))&&
-                    ChessHistory.checkingPiece.canMove(new Square(getCol(), i), ChessHistory.checkPiece.getSquare())){
+            if( getChessModel().getCheckingPiece().canMove(getChessModel().getCheckingPiece().getSquare(),new Square(getCol(), i))&&
+                    getChessModel().getCheckingPiece().canMove(new Square(getCol(), i),getChessModel().getCheckPiece().getSquare())&&
+                    (getCol()!=getChessModel().getCheckPiece().getSquare().getCol()&&i!=getChessModel().getCheckPiece().getSquare().getRow())){
                 coord.add(new PointF(xCord + getCol() * cellSize + cellSize / 2, yCoard + (7 - i) * cellSize + cellSize / 2));
-                return coord;
+               // return coord;
             }
 
         }
@@ -91,14 +107,15 @@ public class Rook extends Piece {
                 continue;
             }
             Piece piece = getChessModel().pieceAt(new Square(getCol(), i));
-            if(ChessHistory.checkingPiece.getCol()==getCol()&&ChessHistory.checkingPiece.getRow()==i){
+            if(getChessModel().getCheckingPiece().getCol()==getCol()&&getChessModel().getCheckingPiece().getRow()==i){
                 coord.add(new PointF(xCord + getCol() * cellSize + cellSize / 2, yCoard + (7 - i) * cellSize + cellSize / 2));
-                return coord;
+              //  return coord;
             }
-            if( ChessHistory.checkingPiece.canMove(ChessHistory.checkingPiece.getSquare(),new Square(getCol(), i))&&
-                    ChessHistory.checkingPiece.canMove(new Square(getCol(), i), ChessHistory.checkPiece.getSquare())){
+            if( getChessModel().getCheckingPiece().canMove(getChessModel().getCheckingPiece().getSquare(),new Square(getCol(), i))&&
+                    getChessModel().getCheckingPiece().canMove(new Square(getCol(), i),getChessModel().getCheckPiece().getSquare())&&
+                    (getCol()!=getChessModel().getCheckPiece().getSquare().getCol()&&i!=getChessModel().getCheckPiece().getSquare().getRow())){
                 coord.add(new PointF(xCord + getCol() * cellSize + cellSize / 2, yCoard + (7 - i) * cellSize + cellSize / 2));
-                return coord;
+               //return coord;
             }
 
         }
@@ -107,14 +124,15 @@ public class Rook extends Piece {
                 continue;
             }
             Piece piece = getChessModel().pieceAt(new Square(i, getRow()));
-            if(ChessHistory.checkingPiece.getCol()==i&&ChessHistory.checkingPiece.getRow()==getRow()){
-                coord.add(new PointF(xCord + getCol() * cellSize + cellSize / 2, yCoard + (7 - i) * cellSize + cellSize / 2));
-                return coord;
+            if(getChessModel().getCheckingPiece().getCol()==i&&getChessModel().getCheckingPiece().getRow()==getRow()){
+                coord.add(new PointF(xCord + i * cellSize + cellSize / 2, yCoard + (7 - getRow()) * cellSize + cellSize / 2));
+               // return coord;
             }
-            if( ChessHistory.checkingPiece.canMove(ChessHistory.checkingPiece.getSquare(),new Square(i, getRow()))&&
-                    ChessHistory.checkingPiece.canMove(new Square(i, getRow()), ChessHistory.checkPiece.getSquare())){
-                coord.add(new PointF(xCord + getCol() * cellSize + cellSize / 2, yCoard + (7 - i) * cellSize + cellSize / 2));
-                return coord;
+            if( getChessModel().getCheckingPiece().canMove(getChessModel().getCheckingPiece().getSquare(),new Square(i, getRow()))&&
+                    getChessModel().getCheckingPiece().canMove(new Square(i, getRow()),getChessModel().getCheckPiece().getSquare())&&
+                    (i!=getChessModel().getCheckPiece().getSquare().getCol()&&getRow()!=getChessModel().getCheckPiece().getSquare().getRow())){
+                coord.add(new PointF(xCord + i * cellSize + cellSize / 2, yCoard + (7 - getRow()) * cellSize + cellSize / 2));
+                //return coord;
             }
 
         }
@@ -123,25 +141,26 @@ public class Rook extends Piece {
                 continue;
             }
             Piece piece = getChessModel().pieceAt(new Square(i, getRow()));
-            if(ChessHistory.checkingPiece.getCol()==i&&ChessHistory.checkingPiece.getRow()==getRow()){
-                coord.add(new PointF(xCord + getCol() * cellSize + cellSize / 2, yCoard + (7 - i) * cellSize + cellSize / 2));
-                return coord;
+            if(getChessModel().getCheckingPiece().getCol()==i&&getChessModel().getCheckingPiece().getRow()==getRow()){
+                coord.add(new PointF(xCord + i * cellSize + cellSize / 2, yCoard + (7 - getRow()) * cellSize + cellSize / 2));
+              //  return coord;
             }
-            if( ChessHistory.checkingPiece.canMove(ChessHistory.checkingPiece.getSquare(),new Square(i, getRow()))&&
-                    ChessHistory.checkingPiece.canMove(new Square(i, getRow()), ChessHistory.checkPiece.getSquare())){
-                coord.add(new PointF(xCord + getCol() * cellSize + cellSize / 2, yCoard + (7 - i) * cellSize + cellSize / 2));
-                return coord;
+            if( getChessModel().getCheckingPiece().canMove(getChessModel().getCheckingPiece().getSquare(),new Square(i, getRow()))&&
+                    getChessModel().getCheckingPiece().canMove(new Square(i, getRow()),getChessModel().getCheckPiece().getSquare())&&
+                    (i!=getChessModel().getCheckPiece().getSquare().getCol()&&getRow()!=getChessModel().getCheckPiece().getSquare().getRow())){
+                coord.add(new PointF(xCord + i * cellSize + cellSize / 2, yCoard + (7 - getRow()) * cellSize + cellSize / 2));
+                //return coord;
             }
 
         }
-        return null;
+        return coord;
     }
 
     @Override
     public ArrayList<PointF> helpCoord(float xCord, float yCoard, float cellSize) {
         ArrayList<PointF> coord = new ArrayList<>();
         erasePossibleMoves();
-        if(ChessHistory.checkingPiece!=null){
+        if(getChessModel().getCheckingPiece()!=null){
             coord =  helpCoordCheck( xCord, yCoard, cellSize);
         }else {
             for (int i = getRow(); i <= 7; i++) {
@@ -182,6 +201,7 @@ public class Rook extends Piece {
                 if (piece == null) {
                     coord.add(new PointF(xCord + i * cellSize + cellSize / 2, yCoard + (7 - getRow()) * cellSize + cellSize / 2));
                 } else if (piece.getPlayer() != getPlayer()) {
+                    coord.add(new PointF(xCord + i * cellSize + cellSize / 2, yCoard + (7 - getRow()) * cellSize + cellSize / 2));
                     break;
                 } else {
                     break;
@@ -196,6 +216,7 @@ public class Rook extends Piece {
                 if (piece == null) {
                     coord.add(new PointF(xCord + i * cellSize + cellSize / 2, yCoard + (7 - getRow()) * cellSize + cellSize / 2));
                 } else if (piece.getPlayer() != getPlayer()) {
+                    coord.add(new PointF(xCord + i * cellSize + cellSize / 2, yCoard + (7 - getRow()) * cellSize + cellSize / 2));
                     break;
                 } else {
                     break;

@@ -21,7 +21,7 @@ public class Queen extends Piece{
     }
 
 
-    private  boolean canRookMove(Square from, Square to) {
+    public  boolean canRookMove(Square from, Square to) {
         if (from.getCol() == to.getCol() && isClearVerticallyBetween(from, to) ||
                 from.getRow() == to.getRow() && isClearHorizontallyBetween(from, to)) {
 
@@ -31,7 +31,9 @@ public class Queen extends Piece{
 
     }
 
-    private boolean canBishopMove(Square from, Square to) {
+    public boolean canBishopMove(Square from, Square to) {
+
+
         if (Math.abs(from.getCol() - to.getCol()) ==
                 Math.abs(from.getRow() - to.getRow())) {
             return isClearDiagonally(from, to);
@@ -40,6 +42,14 @@ public class Queen extends Piece{
     }
     @Override
     public boolean canMove(Square from, Square to) {
+       // if(getChessModel().getCheckPiece()!=null&&getChessModel().getCheckPiece()!=this){
+        if(getChessModel().getCheckingPiece()!=null&&getChessModel().getCheckingPiece()!=this){
+            if(canRookMove(from, to) || canBishopMove(from, to)){
+                return (getChessModel().getCheckingPiece().canMove(getChessModel().getCheckingPiece().getSquare(), to) &&
+                        getChessModel().getCheckingPiece().canMove(to,getChessModel().getCheckPiece().getSquare())) ||
+                        (getChessModel().getCheckingPiece().getRow() == to.getRow() && getChessModel().getCheckingPiece().getCol() == to.getCol());
+            }
+        }
         return canRookMove(from, to) || canBishopMove(from, to);
     }
 
@@ -50,15 +60,19 @@ public class Queen extends Piece{
             if (i == getRow()) {
                 continue;
             }
-            Piece piece = getChessModel().pieceAt(new Square(getCol(), i));
-            if(ChessHistory.checkingPiece.getCol()==getCol()&&ChessHistory.checkingPiece.getRow()==i){
-                coord.add(new PointF(xCord + getCol() * cellSize + cellSize / 2, yCoard + (7 - i) * cellSize + cellSize / 2));
-                return coord;
+            Square piece = new Square(getCol(), i);
+            if(!(canRookMove(getSquare(), piece) || canBishopMove(getSquare(), piece))){
+                continue;
             }
-            if( ChessHistory.checkingPiece.canMove(ChessHistory.checkingPiece.getSquare(),new Square(getCol(), i))&&
-                    ChessHistory.checkingPiece.canMove(new Square(getCol(), i), ChessHistory.checkPiece.getSquare())){
+            if(getChessModel().getCheckingPiece().getCol()==getCol()&&getChessModel().getCheckingPiece().getRow()==i){
                 coord.add(new PointF(xCord + getCol() * cellSize + cellSize / 2, yCoard + (7 - i) * cellSize + cellSize / 2));
-                return coord;
+               // return coord;
+            }
+            if( getChessModel().getCheckingPiece().canMove(getChessModel().getCheckingPiece().getSquare(),new Square(getCol(), i))&&
+                    getChessModel().getCheckingPiece().canMove(new Square(getCol(), i),getChessModel().getCheckPiece().getSquare())&&
+                    (getCol()!=getChessModel().getCheckPiece().getSquare().getCol()&&i!=getChessModel().getCheckPiece().getSquare().getRow())){
+                coord.add(new PointF(xCord + getCol() * cellSize + cellSize / 2, yCoard + (7 - i) * cellSize + cellSize / 2));
+               // return coord;
             }
 
         }
@@ -67,15 +81,19 @@ public class Queen extends Piece{
             if (i == getRow()) {
                 continue;
             }
-            Piece piece = getChessModel().pieceAt(new Square(getCol(), i));
-            if(ChessHistory.checkingPiece.getCol()==getCol()&&ChessHistory.checkingPiece.getRow()==i){
-                coord.add(new PointF(xCord + getCol() * cellSize + cellSize / 2, yCoard + (7 - i) * cellSize + cellSize / 2));
-                return coord;
+            Square piece = new Square(getCol(), i);
+            if(!(canRookMove(getSquare(), piece) || canBishopMove(getSquare(), piece))){
+                continue;
             }
-            if( ChessHistory.checkingPiece.canMove(ChessHistory.checkingPiece.getSquare(),new Square(getCol(), i))&&
-                    ChessHistory.checkingPiece.canMove(new Square(getCol(), i), ChessHistory.checkPiece.getSquare())){
+            if(getChessModel().getCheckingPiece().getCol()==getCol()&&getChessModel().getCheckingPiece().getRow()==i){
                 coord.add(new PointF(xCord + getCol() * cellSize + cellSize / 2, yCoard + (7 - i) * cellSize + cellSize / 2));
-                return coord;
+               // return coord;
+            }
+            if( getChessModel().getCheckingPiece().canMove(getChessModel().getCheckingPiece().getSquare(),new Square(getCol(), i))&&
+                    getChessModel().getCheckingPiece().canMove(new Square(getCol(), i),getChessModel().getCheckPiece().getSquare())&&
+                    (getCol()!=getChessModel().getCheckPiece().getSquare().getCol()&&i!=getChessModel().getCheckPiece().getSquare().getRow())){
+                coord.add(new PointF(xCord + getCol() * cellSize + cellSize / 2, yCoard + (7 - i) * cellSize + cellSize / 2));
+               // return coord;
             }
 
         }
@@ -83,15 +101,19 @@ public class Queen extends Piece{
             if (i == getCol()) {
                 continue;
             }
-            Piece piece = getChessModel().pieceAt(new Square(i, getRow()));
-            if(ChessHistory.checkingPiece.getCol()==i&&ChessHistory.checkingPiece.getRow()==getRow()){
-                coord.add(new PointF(xCord + getCol() * cellSize + cellSize / 2, yCoard + (7 - i) * cellSize + cellSize / 2));
-                return coord;
+            Square piece = new Square(i, getRow());
+            if(!(canRookMove(getSquare(), piece) || canBishopMove(getSquare(), piece))){
+                continue;
             }
-            if( ChessHistory.checkingPiece.canMove(ChessHistory.checkingPiece.getSquare(),new Square(i, getRow()))&&
-                    ChessHistory.checkingPiece.canMove(new Square(i, getRow()), ChessHistory.checkPiece.getSquare())){
-                coord.add(new PointF(xCord + getCol() * cellSize + cellSize / 2, yCoard + (7 - i) * cellSize + cellSize / 2));
-                return coord;
+            if(getChessModel().getCheckingPiece().getCol()==i&&getChessModel().getCheckingPiece().getRow()==getRow()){
+                coord.add(new PointF(xCord + i * cellSize + cellSize / 2, yCoard + (7 - getRow()) * cellSize + cellSize / 2));
+              // return coord;
+            }
+            if( getChessModel().getCheckingPiece().canMove(getChessModel().getCheckingPiece().getSquare(),new Square(i, getRow()))&&
+                    getChessModel().getCheckingPiece().canMove(new Square(i, getRow()),getChessModel().getCheckPiece().getSquare())&&
+                    (i!=getChessModel().getCheckPiece().getSquare().getCol()&&getRow()!=getChessModel().getCheckPiece().getSquare().getRow())){
+                coord.add(new PointF(xCord + i * cellSize + cellSize / 2, yCoard + (7 - getRow()) * cellSize + cellSize / 2));
+                //return coord;
             }
 
         }
@@ -99,15 +121,19 @@ public class Queen extends Piece{
             if (i == getCol()) {
                 continue;
             }
-            Piece piece = getChessModel().pieceAt(new Square(i, getRow()));
-            if(ChessHistory.checkingPiece.getCol()==i&&ChessHistory.checkingPiece.getRow()==getRow()){
-                coord.add(new PointF(xCord + getCol() * cellSize + cellSize / 2, yCoard + (7 - i) * cellSize + cellSize / 2));
-                return coord;
+            Square piece = new Square(i, getRow());
+            if(!(canRookMove(getSquare(), piece) || canBishopMove(getSquare(), piece))){
+                continue;
             }
-            if( ChessHistory.checkingPiece.canMove(ChessHistory.checkingPiece.getSquare(),new Square(i, getRow()))&&
-                    ChessHistory.checkingPiece.canMove(new Square(i, getRow()), ChessHistory.checkPiece.getSquare())){
-                coord.add(new PointF(xCord + getCol() * cellSize + cellSize / 2, yCoard + (7 - i) * cellSize + cellSize / 2));
-                return coord;
+            if(getChessModel().getCheckingPiece().getCol()==i&&getChessModel().getCheckingPiece().getRow()==getRow()){
+                coord.add(new PointF(xCord + i * cellSize + cellSize / 2, yCoard + (7 - getRow()) * cellSize + cellSize / 2));
+              //  return coord;
+            }
+            if( getChessModel().getCheckingPiece().canMove(getChessModel().getCheckingPiece().getSquare(),new Square(i, getRow()))&&
+                    getChessModel().getCheckingPiece().canMove(new Square(i, getRow()),getChessModel().getCheckPiece().getSquare())&&
+                    (i!=getChessModel().getCheckPiece().getSquare().getCol()&&getRow()!=getChessModel().getCheckPiece().getSquare().getRow())){
+                coord.add(new PointF(xCord + i * cellSize + cellSize / 2, yCoard + (7 - getRow()) * cellSize + cellSize / 2));
+              //  return coord;
             }
 
         }
@@ -120,7 +146,12 @@ public class Queen extends Piece{
                 row++;
                 continue;
             }
-            Piece piece = getChessModel().pieceAt(new Square(col, row));
+            Square piece = new Square(col, row);
+            if(!(canRookMove(getSquare(), piece) || canBishopMove(getSquare(), piece))){
+                col--;
+                row++;
+                continue;
+            }
 //            if (piece == null) {
 //                coord.add(new PointF(xCord + col * cellSize + cellSize / 2, yCoard + (7 - row) * cellSize + cellSize / 2));
 //            } else if (piece.getPlayer() != getPlayer()) {
@@ -130,14 +161,15 @@ public class Queen extends Piece{
 //                break;
 //            }
 
-            if(ChessHistory.checkingPiece.getCol()==col&&ChessHistory.checkingPiece.getRow()==row){
+            if(getChessModel().getCheckingPiece().getCol()==col&&getChessModel().getCheckingPiece().getRow()==row){
                 coord.add(new PointF(xCord + col * cellSize + cellSize / 2, yCoard + (7 - row) * cellSize + cellSize / 2));
-                return coord;
+               // return coord;
             }
-            if( ChessHistory.checkingPiece.canMove(ChessHistory.checkingPiece.getSquare(),new Square(col, row))&&
-                    ChessHistory.checkingPiece.canMove(new Square(col, row), ChessHistory.checkPiece.getSquare())){
+            if( getChessModel().getCheckingPiece().canMove(getChessModel().getCheckingPiece().getSquare(),new Square(col, row))&&
+                    getChessModel().getCheckingPiece().canMove(new Square(col, row),getChessModel().getCheckPiece().getSquare())&&
+                    (col!=getChessModel().getCheckPiece().getSquare().getCol()&&row!=getChessModel().getCheckPiece().getSquare().getRow())){
                 coord.add(new PointF(xCord + col * cellSize + cellSize / 2, yCoard + (7 - row) * cellSize + cellSize / 2));
-                return coord;
+              //  return coord;
             }
 
             col--;
@@ -151,7 +183,12 @@ public class Queen extends Piece{
                 row++;
                 continue;
             }
-            Piece piece = getChessModel().pieceAt(new Square(col, row));
+            Square piece = new Square(col, row);
+            if(!(canRookMove(getSquare(), piece) || canBishopMove(getSquare(), piece))){
+                col++;
+                row++;
+                continue;
+            }
 //            if (piece == null) {
 //                coord.add(new PointF(xCord + col * cellSize + cellSize / 2, yCoard + (7 - row) * cellSize + cellSize / 2));
 //            } else if (piece.getPlayer() != getPlayer()) {
@@ -160,14 +197,15 @@ public class Queen extends Piece{
 //            } else {
 //                break;
 //            }
-            if(ChessHistory.checkingPiece.getCol()==col&&ChessHistory.checkingPiece.getRow()==row){
+            if(getChessModel().getCheckingPiece().getCol()==col&&getChessModel().getCheckingPiece().getRow()==row){
                 coord.add(new PointF(xCord + col * cellSize + cellSize / 2, yCoard + (7 - row) * cellSize + cellSize / 2));
-                return coord;
+               // return coord;
             }
-            if( ChessHistory.checkingPiece.canMove(ChessHistory.checkingPiece.getSquare(),new Square(col, row))&&
-                    ChessHistory.checkingPiece.canMove(new Square(col, row), ChessHistory.checkPiece.getSquare())){
+            if( getChessModel().getCheckingPiece().canMove(getChessModel().getCheckingPiece().getSquare(),new Square(col, row))&&
+                    getChessModel().getCheckingPiece().canMove(new Square(col, row),getChessModel().getCheckPiece().getSquare())&&
+                    (col!=getChessModel().getCheckPiece().getSquare().getCol()&&row!=getChessModel().getCheckPiece().getSquare().getRow())){
                 coord.add(new PointF(xCord + col * cellSize + cellSize / 2, yCoard + (7 - row) * cellSize + cellSize / 2));
-                return coord;
+              //  return coord;
             }
             col++;
             row++;
@@ -180,7 +218,12 @@ public class Queen extends Piece{
                 row--;
                 continue;
             }
-            Piece piece = getChessModel().pieceAt(new Square(col, row));
+            Square piece = new Square(col, row);
+            if(!(canRookMove(getSquare(), piece) || canBishopMove(getSquare(), piece))){
+                col++;
+                row--;
+                continue;
+            }
 //            if (piece == null) {
 //                coord.add(new PointF(xCord + col * cellSize + cellSize / 2, yCoard + (7 - row) * cellSize + cellSize / 2));
 //            } else if (piece.getPlayer() != getPlayer()) {
@@ -189,14 +232,15 @@ public class Queen extends Piece{
 //            } else {
 //                break;
 //            }
-            if(ChessHistory.checkingPiece.getCol()==col&&ChessHistory.checkingPiece.getRow()==row){
+            if(getChessModel().getCheckingPiece().getCol()==col&&getChessModel().getCheckingPiece().getRow()==row){
                 coord.add(new PointF(xCord + col * cellSize + cellSize / 2, yCoard + (7 - row) * cellSize + cellSize / 2));
-                return coord;
+              //  return coord;
             }
-            if( ChessHistory.checkingPiece.canMove(ChessHistory.checkingPiece.getSquare(),new Square(col, row))&&
-                    ChessHistory.checkingPiece.canMove(new Square(col, row), ChessHistory.checkPiece.getSquare())){
+            if( getChessModel().getCheckingPiece().canMove(getChessModel().getCheckingPiece().getSquare(),new Square(col, row))&&
+                    getChessModel().getCheckingPiece().canMove(new Square(col, row),getChessModel().getCheckPiece().getSquare())&&
+                    (col!=getChessModel().getCheckPiece().getSquare().getCol()&&row!=getChessModel().getCheckPiece().getSquare().getRow())){
                 coord.add(new PointF(xCord + col * cellSize + cellSize / 2, yCoard + (7 - row) * cellSize + cellSize / 2));
-                return coord;
+               // return coord;
             }
             col++;
             row--;
@@ -209,7 +253,12 @@ public class Queen extends Piece{
                 row--;
                 continue;
             }
-            Piece piece = getChessModel().pieceAt(new Square(col, row));
+            Square piece = new Square(col, row);
+            if(!(canRookMove(getSquare(), piece) || canBishopMove(getSquare(), piece))){
+                col--;
+                row--;
+                continue;
+            }
 //            if (piece == null) {
 //                coord.add(new PointF(xCord + col * cellSize + cellSize / 2, yCoard + (7 - row) * cellSize + cellSize / 2));
 //            } else if (piece.getPlayer() != getPlayer()) {
@@ -218,14 +267,15 @@ public class Queen extends Piece{
 //            } else {
 //                break;
 //            }
-            if(ChessHistory.checkingPiece.getCol()==col&&ChessHistory.checkingPiece.getRow()==row){
+            if(getChessModel().getCheckingPiece().getCol()==col&&getChessModel().getCheckingPiece().getRow()==row){
                 coord.add(new PointF(xCord + col * cellSize + cellSize / 2, yCoard + (7 - row) * cellSize + cellSize / 2));
-                return coord;
+             //   return coord;
             }
-            if( ChessHistory.checkingPiece.canMove(ChessHistory.checkingPiece.getSquare(),new Square(col, row))&&
-                    ChessHistory.checkingPiece.canMove(new Square(col, row), ChessHistory.checkPiece.getSquare())){
+            if( getChessModel().getCheckingPiece().canMove(getChessModel().getCheckingPiece().getSquare(),new Square(col, row))&&
+                    getChessModel().getCheckingPiece().canMove(new Square(col, row),getChessModel().getCheckPiece().getSquare())&&
+                    (col!=getChessModel().getCheckPiece().getSquare().getCol()&&row!=getChessModel().getCheckPiece().getSquare().getRow())){
                 coord.add(new PointF(xCord + col * cellSize + cellSize / 2, yCoard + (7 - row) * cellSize + cellSize / 2));
-                return coord;
+             //   return coord;
             }
             col--;
             row--;
@@ -237,7 +287,7 @@ public class Queen extends Piece{
     public ArrayList<PointF> helpCoord(float xCord, float yCoard, float cellSize) {
         ArrayList<PointF> coord = new ArrayList<>();
         erasePossibleMoves();
-        if(ChessHistory.checkingPiece!=null){
+        if(getChessModel().getCheckPiece()!=null){
             coord =  helpCoordCheck( xCord, yCoard, cellSize);
         }else {
             for (int i = getRow(); i <= 7; i++) {

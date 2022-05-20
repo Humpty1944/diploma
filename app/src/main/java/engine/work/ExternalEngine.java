@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.channels.FileChannel;
+import java.util.Locale;
 import java.util.Map;
 
 import engine.EngineUtil;
@@ -127,6 +128,7 @@ public class ExternalEngine extends UCIEngineBase {
                         }
                     }
                 } catch (IOException ignore) {
+                    System.out.println(ignore);
                 }
                 inLines.close();
             });
@@ -144,6 +146,7 @@ public class ExternalEngine extends UCIEngineBase {
                         if (len < 0)
                             break;
                     } catch (IOException e) {
+                        System.out.println(e);
                         return;
                     }
                 }
@@ -186,8 +189,8 @@ public class ExternalEngine extends UCIEngineBase {
     }
 
     private int hashMB = -1;
-    private String gaviotaTbPath = "";
-    private String syzygyPath = "";
+//    private String gaviotaTbPath = "";
+//    private String syzygyPath = "";
     private boolean optionsInitialized = false;
 
     @Override
@@ -195,17 +198,17 @@ public class ExternalEngine extends UCIEngineBase {
         super.initOptions(engineOptions);
         hashMB = getHashMB(engineOptions);
         setOption("Hash", hashMB);
-        syzygyPath = engineOptions.getEngineRtbPath(false);
-        setOption("SyzygyPath", syzygyPath);
-        gaviotaTbPath = engineOptions.getEngineGtbPath(false);
-        setOption("GaviotaTbPath", gaviotaTbPath);
+//        syzygyPath = engineOptions.getEngineRtbPath(false);
+//        setOption("SyzygyPath", syzygyPath);
+//        gaviotaTbPath = engineOptions.getEngineGtbPath(false);
+//        setOption("GaviotaTbPath", gaviotaTbPath);
         optionsInitialized = true;
     }
 
-    @Override
-    protected File getOptionsFile() {
-        return new File(engineFileName.getAbsolutePath() + ".ini");
-    }
+//    @Override
+//    protected File getOptionsFile() {
+//        return new File(engineFileName.getAbsolutePath() + ".ini");
+//    }
 
     /** Reduce too large hash sizes. */
     private static int getHashMB(EngineOptions engineOptions) {
@@ -264,12 +267,12 @@ public class ExternalEngine extends UCIEngineBase {
 
     @Override
     public void setOption(String name, boolean value) {
-
+        writeLineToEngine(String.format(Locale.US, "setoption name %s value %s", name, value));
     }
 
     @Override
     public boolean setOption(String name, String value) {
-        return false;
+        writeLineToEngine(String.format(Locale.US, "setoption name %s value %s", name, value)); return false;
     }
 
 

@@ -44,8 +44,8 @@ public class PromotionView extends View {
 
     {
         imgChess = new HashSet<>();
-        imgChess.add(R.drawable.chess_king_black);
-        imgChess.add(R.drawable.chess_king_white);
+//        imgChess.add(R.drawable.chess_king_black);
+//        imgChess.add(R.drawable.chess_king_white);
         imgChess.add(R.drawable.chess_queen_black);
         imgChess.add(R.drawable.chess_queen_white);
         imgChess.add(R.drawable.chess_rook_black);
@@ -78,10 +78,10 @@ public class PromotionView extends View {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        float chessBoardSize = Math.min(canvas.getHeight(), canvas.getWidth()) * scaleFactor;
+        float chessBoardSize =  canvas.getWidth() * scaleFactor;
         cellSize = chessBoardSize / 8;
         xPos = (canvas.getWidth()) / 2 -cellSize*4/2 ;
-        yPos = (canvas.getHeight() - chessBoardSize) / 2;
+        yPos = (canvas.getHeight()) / 2;
         paint.setColor(Color.BLACK);
         paint.setAlpha(128);
         canvas.drawRect(0, 0, canvas.getWidth(), canvas.getHeight(), paint);
